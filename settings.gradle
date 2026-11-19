@@ -11,6 +11,8 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        // PDFBox's optional JPX codec is still published only on JCenter.
+        jcenter()
     }
 }
 
