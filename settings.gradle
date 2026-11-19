@@ -11,8 +11,6 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        // JP2ForAndroid 1.0.3 is mirrored in Appodeal's public Maven repository.
-        maven { url = uri('https://artifactory.appodeal.com/appodeal-public/') }
     }
 }
 
