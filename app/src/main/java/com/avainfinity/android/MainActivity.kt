@@ -221,6 +221,9 @@ class MainActivity : Activity() {
     private fun label(value: String, size: Float = 14f): TextView =
         text(value, size, secondaryTextColor)
 
+    private fun label(value: String, size: Float, color: Int): TextView =
+        text(value, size, color)
+
     private fun button(value: String, onClick: () -> Unit): TextView =
         createButton(value, secondary = false, onClick = onClick)
 
@@ -1388,7 +1391,6 @@ class MainActivity : Activity() {
                     .putInt("avatar_size", avatarSize)
                     .putBoolean("avatar_visible", avatarVisible).apply()
             }
-            surface = Color.argb(glassAlpha, 255, 255, 255)
             buildShell()
             showPage("profile")
         }.apply { setMarginsCompat(top = 8) })
@@ -3915,7 +3917,7 @@ class MainActivity : Activity() {
             if (::avatarLarge.isInitialized) avatarLarge else null
         )
         targets.forEach { image ->
-            val canShowOwnerAvatar = !aacs.isInitialized || !aacs.isPublicOnlyModeActive()
+            val canShowOwnerAvatar = !::aacs.isInitialized || !aacs.isPublicOnlyModeActive()
             image.visibility = if (avatarVisible && canShowOwnerAvatar) View.VISIBLE else View.GONE
             try {
                 if (profileUri != null) image.setImageURI(profileUri)
