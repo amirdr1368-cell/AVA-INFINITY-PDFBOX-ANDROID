@@ -91,7 +91,7 @@ public class PDFStreamParserTest extends TestCase
 
     public void testInlineImageLimitExceeded() throws IOException
     {
-        StringBuilder content = new StringBuilder("ID\\n");
+        StringBuilder content = new StringBuilder("ID\n");
         for (int i = 0; i < PDFStreamParser.MAX_INLINE_IMAGE_BYTES + 1; i++)
         {
             content.append('A');
