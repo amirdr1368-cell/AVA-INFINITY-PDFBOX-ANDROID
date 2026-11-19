@@ -9,6 +9,10 @@ on:
     branches:
       - master
 
+concurrency:
+  group: ava-mobile-build-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
