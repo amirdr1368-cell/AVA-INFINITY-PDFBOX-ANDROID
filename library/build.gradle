@@ -53,9 +53,6 @@ dependencies {
     api "org.bouncycastle:bcpkix-jdk15to18:1.73"
     api "org.bouncycastle:bcutil-jdk15to18:1.73"
 
-    // Optional JPX codec is compile-time only, matching the upstream PDFBox Android project.
-    compileOnly 'com.gemalto.jp2:jp2-android:1.0.3'
-
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.mockito:mockito-core:5.8.0'
     testImplementation 'com.googlecode.java-diff-utils:diffutils:1.3.0'
