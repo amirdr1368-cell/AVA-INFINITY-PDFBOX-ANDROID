@@ -16,6 +16,7 @@ object AvaBackupChain {
 
     private val archiveIdPattern = Regex("[A-Fa-f0-9-]{16,64}")
     private val digestPattern = Regex("[a-f0-9]{64}")
+    private val fullCheckpointKinds = setOf("initial", "daily", "weekly", "monthly", "recovery", "milestone")
 
     fun createFull(
         payload: JSONObject,
@@ -24,9 +25,14 @@ object AvaBackupChain {
         createdAt: Long = System.currentTimeMillis(),
         checkpointLabels: List<String> = listOf(checkpointKind)
     ): JSONObject {
-        require(checkpointKind in setOf("initial", "daily", "weekly", "monthly", "recovery", "milestone"))
+        require(checkpointKind in fullCheckpointKinds)
         require(archiveIdPattern.matches(archiveId))
         require(createdAt > 0)
+        require(checkpointLabels.isNotEmpty())
+        require(checkpointLabels.all { it in fullCheckpointKinds })
+        require(checkpointLabels.distinct().size == checkpointLabels.size)
+        require(checkpointKind in checkpointLabels)
+        val safeLabels = checkpointLabels.sorted()
         val copy = JSONObject(payload.toString())
         val archive = JSONObject()
             .put("format", FORMAT)
