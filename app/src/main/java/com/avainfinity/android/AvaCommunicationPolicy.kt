@@ -92,7 +92,7 @@ object AvaCommunicationPolicy {
             else -> "Use a balanced response length."
         }
         val emojiInstruction = if (useEmojis) {
-            "Use emojis sparingly when they fit the context; avoid them in serious or sensitive moments."
+            "Use emojis sparingly when they fit the context. Avoid them in serious or sensitive moments."
         } else {
             "Avoid emojis."
         }
