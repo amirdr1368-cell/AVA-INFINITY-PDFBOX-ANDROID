@@ -89,6 +89,40 @@ public class PDFStreamParserTest extends TestCase
         testInlineImage2ops("ID\n12EI5EI          Q   ", "12EI5", "Q");
     }
 
+    public void testInlineImageLimitExceeded() throws IOException
+    {
+        StringBuilder content = new StringBuilder("ID\\n");
+        for (int i = 0; i < PDFStreamParser.MAX_INLINE_IMAGE_BYTES + 1; i++)
+        {
+            content.append('A');
+        }
+        content.append("EI Q          ");
+
+        try
+        {
+            new PDFStreamParser(content.toString().getBytes("ISO-8859-1")).parseNextToken();
+            fail("Expected InlineImageLimitException");
+        }
+        catch (InlineImageLimitException expected)
+        {
+            assertEquals(PDFStreamParser.MAX_INLINE_IMAGE_BYTES, expected.getMaximumBytes());
+        }
+    }
+
+    public void testInlineImageAtLimitAccepted() throws IOException
+    {
+        StringBuilder content = new StringBuilder("ID\\n");
+        for (int i = 0; i < PDFStreamParser.MAX_INLINE_IMAGE_BYTES; i++)
+        {
+            content.append('A');
+        }
+        content.append("EI Q          ");
+
+        Operator image = (Operator) new PDFStreamParser(
+            content.toString().getBytes("ISO-8859-1")).parseNextToken();
+        assertEquals(PDFStreamParser.MAX_INLINE_IMAGE_BYTES, image.getImageData().length);
+    }
+
     // checks whether there are two operators, one inline image and the named operator
     private void testInlineImage2ops(String s, String imageDataString, String opName) throws IOException
     {
