@@ -1,12 +1,6 @@
-name: AVA INFINITY Android Build
+name: AVA INFINITY Android Build (Manual)
 
 on:
-  pull_request:
-    branches:
-      - master
-  push:
-    branches:
-      - ava/mobile-app-integration
   workflow_dispatch:
 
 permissions:
@@ -14,7 +8,7 @@ permissions:
 
 jobs:
   build:
-    name: Build AVA APK and run unit tests
+    name: Manual APK build
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
