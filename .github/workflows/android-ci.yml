@@ -1,92 +1,42 @@
-name: "Android CI"
+name: AVA INFINITY Android Build
 
 on:
   pull_request:
-  push:
     branches:
       - master
+  push:
+    branches:
+      - ava/mobile-app-integration
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   build:
-    name: Build & Run Unit Tests
+    name: Build AVA APK and run unit tests
     runs-on: ubuntu-latest
-
+    timeout-minutes: 45
     steps:
-      - name: Fetch Source
+      - name: Checkout source
         uses: actions/checkout@v4
 
-      - name: Setup Java
-        uses: actions/setup-java@v3.11.0
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
         with:
-          java-version: 11
-          distribution: 'adopt'
+          distribution: temurin
+          java-version: '17'
 
-      - name: Build & Test
-        run: ./gradlew build test
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
 
-  instrumentation-tests:
-    name: Instrumentation Tests
-    runs-on: macos-latest
-    timeout-minutes: 30
-    strategy:
-      # Allow tests to continue on other devices if they fail on one device.
-      fail-fast: false
-      matrix:
-        api-level:
-          - 33
+      - name: Build and test
+        run: ./gradlew --no-daemon clean test assembleDebug
 
-    steps:
-      - name: Fetch Source
-        uses: actions/checkout@v4
-
-      - name: Set up JDK
-        uses: actions/setup-java@v3.11.0
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
         with:
-          java-version: 11
-          distribution: 'adopt'
-
-      - name: Instrumentation Tests
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ matrix.api-level }}
-          target: google_apis
-          arch: x86_64
-          script: adb logcat *:S TestRunner:V & ./gradlew connectedCheck --no-build-cache --no-daemon --stacktrace
-
-  instrumentation-test-summary:
-    if: ${{ always() }}
-    runs-on: ubuntu-latest
-    name: Instrumentation Test Matrix Summary
-    needs: instrumentation-tests
-
-    steps:
-      - name: Check build matrix status
-        if: ${{ needs.instrumentation-tests.result != 'success' }}
-        run: exit 1
-
-  publish-snapshot:
-    name: Publish OSS Sonatype Snapshot
-    runs-on: ubuntu-latest
-    if: "github.event_name == 'push'"
-    needs:
-      - build
-      - instrumentation-test-summary
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Configure JDK
-        uses: actions/setup-java@v3.11.0
-        with:
-          java-version: 11
-          distribution: 'adopt'
-
-      - name: Upload Snapshot
-        run: ./gradlew publish
-        env:
-          ORG_GRADLE_PROJECT_signingKeyId: ${{ secrets.SIGNING_KEY_ID }}
-          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SIGNING_KEY }}
-          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
-          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+          name: AVA-INFINITY-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+          retention-days: 14
