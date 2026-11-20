@@ -56,9 +56,17 @@ object AvaWardrobeMediaRestoreTransaction {
         }
 
         val next = JSONArray(currentIndexJson)
+        require(preview.entries.size <= AvaWardrobeMediaBundleCodec.MAX_ITEMS)
+        require(preview.entries.map { it.itemId }.distinct().size == preview.entries.size)
         val additions = mutableListOf<AvaWardrobeMediaBundleCodec.PreviewEntry>()
         var unchanged = 0
         preview.entries.forEach { entry ->
+            require(entry.itemId.matches(Regex("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89aAbB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}")))
+            require(entry.fileName.matches(Regex("wardrobe_${entry.itemId}\\.(jpg|png|gif|webp)")))
+            require(entry.category in setOf("private", "sporty", "everyday", "formal", "homewear", "hairstyle", "other"))
+            require(entry.byteLength in 1L..AvaWardrobeMediaBundleCodec.MAX_ITEM_BYTES)
+            require(entry.sha256.matches(Regex("[0-9a-fA-F]{64}")))
+            require(entry.stagedFile.canonicalFile.parentFile == preview.stagingDirectory.canonicalFile)
             require(isOwnerAuthorized()) { "Owner session changed during restore preparation." }
             val existing = byId[entry.itemId]
             if (existing != null) {
