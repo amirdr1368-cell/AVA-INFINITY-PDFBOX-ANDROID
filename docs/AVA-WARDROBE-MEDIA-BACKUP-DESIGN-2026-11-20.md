@@ -293,3 +293,14 @@ Verification status:
 - Tests have not been executed. No Gradle task, APK build or GitHub Actions workflow has been run.
 - No UI export/restore flow is wired to this codec yet.
 
+
+### Owner-only export and authenticated preview UI
+
+The wardrobe page now exposes two separate actions, both gated by the strict approved owner session:
+- **Encrypted media export:** collects the complete private image index (no silent partial export), validates each generated private file, creates the encrypted companion in an internal temporary file, authenticates and decodes every staged image, writes to the user-selected document destination, then opens that destination again and authenticates it before reporting success. The passphrase is held only for the operation and character buffers are cleared.
+- **Restore preview:** opens a user-selected bundle, prompts for its passphrase, decrypts into a new cache staging directory, verifies GCM authentication, manifest limits, lengths, hashes, image signatures and bounded Android decode, then displays bundle metadata and category counts. The staging directory is deleted when the preview is dismissed or any step fails.
+
+Important current boundary:
+- This UI does **not** apply restored images, change the live wardrobe index, replace existing files, or delete existing files.
+- The next implementation stage must add a separate owner-confirmed staging/apply transaction with a pre-change media snapshot, index validation, safe promotion, read-back verification, rollback and crash recovery.
+- Export and import actions have not been compiled or exercised on a device. No tests, Gradle build, APK build or Actions run has been performed.
