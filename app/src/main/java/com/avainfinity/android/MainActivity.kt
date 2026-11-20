@@ -1409,11 +1409,13 @@ class MainActivity : Activity() {
             orientation = LinearLayout.VERTICAL
             setPadding(0, dp(8), 0, dp(18))
         }
-        val ownerOnly = aacs.hasActiveSession() &&
-            aacs.currentSessionPersonId() == "owner" &&
-            aacs.currentSessionLevel() == 1 &&
-            aacs.isCurrentSessionApproved() &&
-            !aacs.isPublicOnlyModeActive()
+        val ownerOnly = AvaWardrobeMediaPolicy.canAccessOwnerMedia(
+            aacs.isPublicOnlyModeActive(),
+            aacs.hasActiveSession(),
+            aacs.isCurrentSessionApproved(),
+            aacs.currentSessionLevel(),
+            aacs.currentSessionPersonId()
+        )
         if (!ownerOnly) {
             val locked = card()
             locked.addView(text("مجموعه خصوصی", 20f, accent, true))
@@ -1573,11 +1575,13 @@ class MainActivity : Activity() {
     }
 
     private fun showAddWardrobeImageDialog() {
-        val ownerOnly = aacs.hasActiveSession() &&
-            aacs.currentSessionPersonId() == "owner" &&
-            aacs.currentSessionLevel() == 1 &&
-            aacs.isCurrentSessionApproved() &&
-            !aacs.isPublicOnlyModeActive()
+        val ownerOnly = AvaWardrobeMediaPolicy.canAccessOwnerMedia(
+            aacs.isPublicOnlyModeActive(),
+            aacs.hasActiveSession(),
+            aacs.isCurrentSessionApproved(),
+            aacs.currentSessionLevel(),
+            aacs.currentSessionPersonId()
+        )
         if (!ownerOnly) {
             Toast.makeText(this, "برای افزودن تصویر، نشست تأییدشده مالک لازم است.", Toast.LENGTH_LONG).show()
             return
@@ -1615,11 +1619,13 @@ class MainActivity : Activity() {
     }
 
     private fun saveOwnerWardrobeImage(uri: Uri) {
-        val ownerOnly = aacs.hasActiveSession() &&
-            aacs.currentSessionPersonId() == "owner" &&
-            aacs.currentSessionLevel() == 1 &&
-            aacs.isCurrentSessionApproved() &&
-            !aacs.isPublicOnlyModeActive()
+        val ownerOnly = AvaWardrobeMediaPolicy.canAccessOwnerMedia(
+            aacs.isPublicOnlyModeActive(),
+            aacs.hasActiveSession(),
+            aacs.isCurrentSessionApproved(),
+            aacs.currentSessionLevel(),
+            aacs.currentSessionPersonId()
+        )
         val name = pendingWardrobePhotoName
         val category = pendingWardrobePhotoCategory
         pendingWardrobePhotoName = null
