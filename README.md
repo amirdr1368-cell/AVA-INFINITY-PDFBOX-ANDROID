@@ -30,6 +30,7 @@ GitHub Actions runs the same tests and APK assembly on the `ava/**` integration 
 - [GLASS UI 2.0 implementation status](docs/AVA-MOBILE-GLASS-UI-2.0-IMPLEMENTATION-STATUS.md)
 - [Approved UI 2.0 design](docs/AVA-MOBILE-UI-2.0-APPROVED.md)
 - [Project master change register](docs/PROJECT-MASTER-CHANGE-REGISTER.md)
+- [AVA wardrobe register and implementation status](docs/AVA-WARDROBE-REGISTER-2026-11-20.md)
 - [PDFBox upstream project](https://github.com/TomRoush/PdfBox-Android)
 
 ## Licensing
