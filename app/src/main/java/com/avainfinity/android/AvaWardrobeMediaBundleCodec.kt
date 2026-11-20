@@ -187,6 +187,8 @@ object AvaWardrobeMediaBundleCodec {
                 cipher.updateAAD(header)
                 val stagedEntries = mutableListOf<PreviewEntry>()
                 var totalBytes = 0L
+                var bundleId = ""
+                var createdAt = 0L
                 AuthenticatedCipherInputStream(bounded, cipher).use { decrypted ->
                     val data = DataInputStream(decrypted)
                     val manifestLength = data.readInt()
@@ -196,8 +198,8 @@ object AvaWardrobeMediaBundleCodec {
                     val manifest = JSONObject(String(manifestBytes, Charsets.UTF_8))
                     require(manifest.optString("format") == "AVA-WARDROBE-MEDIA-1")
                     require(manifest.optInt("schemaVersion") == 1)
-                    val bundleId = manifest.optString("bundleId")
-                    val createdAt = manifest.optLong("createdAt")
+                    bundleId = manifest.optString("bundleId")
+                    createdAt = manifest.optLong("createdAt")
                     require(uuidV4.matches(bundleId) && createdAt > 0)
                     val array = manifest.optJSONArray("entries")
                         ?: throw IllegalArgumentException("Media manifest entries are missing.")
