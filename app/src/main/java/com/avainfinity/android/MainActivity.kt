@@ -283,7 +283,7 @@ class MainActivity : Activity() {
         avatar = ImageView(this).apply {
             val thumbSize = dp((56f * avatarSize / 148f).toInt().coerceIn(38, 76))
             layoutParams = LinearLayout.LayoutParams(thumbSize, thumbSize)
-            background = rounded(Color.rgb(91, 65, 99), 60, Color.rgb(224, 181, 218))
+            background = rounded(AvaGlassTheme.Plum800, 60, AvaGlassTheme.NexusIce)
             clipToOutline = true
             scaleType = ImageView.ScaleType.CENTER_CROP
             visibility = if (avatarVisible && !aacs.isPublicOnlyModeActive()) View.VISIBLE else View.GONE
@@ -325,7 +325,7 @@ class MainActivity : Activity() {
             val selected = if (key == "ava") {
                 page in setOf("ava", "profile", "voice", "secret", "daily", "console", "security", "wardrobe")
             } else page == key
-            val item = text(title, 13f, if (selected) { if (lightTheme) AvaGlassTheme.LightPrimaryText else AvaGlassTheme.Lavender300 } else secondaryTextColor, true).apply {
+            val item = text(title, 13f, if (selected) { if (lightTheme) AvaGlassTheme.LightPrimaryText else AvaGlassTheme.NexusIce } else secondaryTextColor, true).apply {
                 gravity = Gravity.CENTER
                 minimumHeight = dp(48)
                 isSelected = selected
@@ -931,8 +931,8 @@ class MainActivity : Activity() {
         if (aacs.isPublicOnlyModeActive()) {
             contentArea.addView(label(
                 "حالت حریم خصوصی عمومی فعاله: حافظه‌های شخصی قفل‌اند و پیام‌ها به سرویس خارجی ارسال نمی‌شن.",
-                12f, Color.rgb(238, 194, 220)
-            ).apply { setPadding(dp(10), dp(8), dp(10), dp(8)); background = rounded(Color.argb(45, 219, 170, 210), 14) })
+                12f, AvaGlassTheme.NexusIce
+            ).apply { setPadding(dp(10), dp(8), dp(10), dp(8)); background = rounded(Color.argb(42, 135, 205, 235), 14) })
         } else {
             contentArea.addView(button("🔒 فعال‌سازی فوری حریم خصوصی") {
                 val saved = aacs.publicOnlyMode("privacy mode activated directly from conversation")
@@ -982,7 +982,7 @@ class MainActivity : Activity() {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
             setPadding(dp(8), dp(6), dp(6), dp(6))
-            background = rounded(Color.argb(48, 255, 255, 255), 24, Color.argb(95, 231, 192, 224))
+            background = rounded(Color.argb(48, 255, 255, 255), 24, Color.argb(125, 135, 205, 235))
         }
         val input = EditText(this).apply {
             hint = "پیامت رو بنویس..."
