@@ -9,9 +9,13 @@ import android.graphics.drawable.GradientDrawable
  * Kept independent from domain, storage and access-control policy.
  */
 object AvaGlassTheme {
-    val Night950: Int = Color.rgb(16, 10, 24)
-    val Night900: Int = Color.rgb(25, 16, 34)
-    val Plum800: Int = Color.rgb(48, 32, 61)
+    // Obsidian x Nexus app palette
+    val Night950: Int = Color.rgb(7, 10, 16)
+    val Night900: Int = Color.rgb(15, 20, 30)
+    val Plum800: Int = Color.rgb(23, 34, 50)
+    val NexusIce: Int = Color.rgb(135, 205, 235)
+    val NexusBlue: Int = Color.rgb(55, 135, 190)
+    // Ava's character palette, not the app-wide theme
     val Lavender500: Int = Color.rgb(169, 133, 200)
     val Lavender300: Int = Color.rgb(216, 188, 232)
     val RoseGold500: Int = Color.rgb(197, 142, 134)
@@ -49,7 +53,7 @@ object AvaGlassTheme {
         val stroke = if (light) {
             Color.argb(165, 190, 150, 205)
         } else {
-            Color.argb(78, 255, 255, 255)
+            Color.argb(92, 135, 205, 235)
         }
         return GradientDrawable().apply {
             setColor(fill)
@@ -63,12 +67,12 @@ object AvaGlassTheme {
         val fill = if (light) {
             Color.argb(125, 216, 188, 232)
         } else {
-            Color.argb(58, 169, 133, 200)
+            Color.argb(54, 55, 135, 190)
         }
         val stroke = if (light) {
             Color.argb(170, 197, 142, 134)
         } else {
-            Color.argb(120, 216, 188, 232)
+            Color.argb(150, 135, 205, 235)
         }
         return GradientDrawable().apply {
             setColor(fill)
@@ -112,13 +116,13 @@ object AvaGlassTheme {
         val colors = if (light) {
             intArrayOf(Color.rgb(229, 203, 225), Color.rgb(244, 225, 228))
         } else {
-            intArrayOf(Color.rgb(110, 77, 131), Color.rgb(115, 75, 105))
+            intArrayOf(Color.rgb(32, 91, 128), Color.rgb(27, 59, 88))
         }
         return GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, colors).apply {
             cornerRadius = 18f * density
             setStroke(
                 (1f * density).toInt().coerceAtLeast(1),
-                if (light) Color.argb(190, 190, 145, 204) else Color.argb(125, 229, 190, 222)
+                if (light) Color.argb(190, 190, 145, 204) else Color.argb(155, 135, 205, 235)
             )
         }
     }
