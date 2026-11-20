@@ -1433,6 +1433,8 @@ class MainActivity : Activity() {
             .apply { setMarginsCompat(top = 10) })
         body.addView(label("تصاویر انتخابی تو در حافظه داخلی همین گوشی ذخیره می‌شوند و در همین بخش قابل مشاهده خواهند بود.", 11f)
             .apply { setPadding(dp(2), dp(6), dp(2), 0) })
+        body.addView(label("نکته پشتیبان: تصاویر شخصی فعلاً داخل فایل پشتیبان رمزگذاری‌شده قرار نمی‌گیرند. پیش از حذف برنامه یا پاک‌کردن داده‌های آن، نسخه جداگانه‌ای از عکس‌ها نگه دار.", 11f, Color.rgb(190, 132, 75))
+            .apply { setPadding(dp(2), dp(6), dp(2), dp(4)) })
 
         try {
             val raw = assets.open("ava-wardrobe-catalog.json").bufferedReader(Charsets.UTF_8).use { it.readText() }
