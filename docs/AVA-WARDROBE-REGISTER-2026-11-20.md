@@ -36,3 +36,12 @@ Implement only on `ava/mobile-app-integration`. Keep `master` untouched and PR #
 - Ava's style suggestions: Glossy High Ponytail, Half-Up Soft Waves, Low Messy Bun, Side Braid & Waves, and Claw-Clip French Twist.
 - The owner wardrobe page now reads and lists the hairstyle catalog.
 - The image URLs are external inspiration references only. They are not local image assets and are not embedded in the APK.
+
+
+## Visual reference progress (2026-11-20)
+
+- Added curated external image references for the four approved core looks: Royal Lilac Sport, Soft Casual, Royal Lilac Evening, and Cozy Lilac Home.
+- The six hairstyle entries retain their selected external image references.
+- Both catalogs explicitly mark these as `EXTERNAL_REFERENCE_ONLY`. They are reference URLs, not downloaded/bundled image files.
+- The 123 numbered wardrobe designs remain approved catalog entries with local visual assets pending. Do not count external links as local image assets.
+- No Android build or GitHub Actions workflow was run as part of this visual-reference update.
