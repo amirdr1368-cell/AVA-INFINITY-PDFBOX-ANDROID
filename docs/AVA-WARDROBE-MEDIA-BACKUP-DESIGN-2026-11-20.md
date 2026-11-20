@@ -198,6 +198,20 @@ Commit: `114b7683f431f4a2b5c5f716ced8f582f016f126`.
 Tests and build remain unexecuted.
 
 
+## 17. Wardrobe image save transaction hardening (2026-11-20)
+
+Implemented on `ava/mobile-app-integration`:
+- The owner image save flow now records a dedicated audit authorization event before committing the updated encrypted preference index.
+- The previous index string is retained during the operation. The new index is committed and immediately read back for exact equality verification.
+- If the index commit/read-back fails, the code attempts to restore the exact previous index and verifies that rollback.
+- If rollback cannot be verified, the code checks whether the live index still references the newly finalized image. It preserves that file when a reference remains, rather than deleting a file that the index may still point to.
+- This removes the previous ordering hazard where an audit failure after index commit could trigger image deletion while leaving a dangling index record.
+
+Verification:
+- Source was committed and should be read back from GitHub before treating the change as verified.
+- Unit tests, Gradle tasks, APK build and GitHub Actions remain unexecuted.
+- This is a local save-transaction hardening only. It does not implement media export, encrypted media backup, or restore.
+
 ## 16. Private file-path validation hardening (2026-11-20)
 
 Implemented:
