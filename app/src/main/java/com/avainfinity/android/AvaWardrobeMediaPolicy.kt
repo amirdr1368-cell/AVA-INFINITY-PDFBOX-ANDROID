@@ -6,7 +6,7 @@ import java.io.File
  * Strict access and storage-path policy for owner-only wardrobe media.
  */
 object AvaWardrobeMediaPolicy {
-    private val generatedImageName = Regex("wardrobe_[0-9a-fA-F-]{36}\\.(jpg|png|gif|webp)")
+    private val generatedImageName = Regex("wardrobe_[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89aAbB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}\\.(jpg|png|gif|webp)")
 
     fun canAccessOwnerMedia(
         publicOnlyMode: Boolean,
