@@ -107,6 +107,56 @@ class AvaWardrobeMediaRestoreTransactionTest {
         } finally { f.base.deleteRecursively() }
     }
 
+    @Test fun staleIndexAbortsBeforeJournalOrLivePromotion() {
+        val f = fixture()
+        try {
+            val newerIndex = """[{"itemId":"${UUID.randomUUID()}","sha256":"${"b".repeat(64)}"}]"""
+            var writes = 0
+            var failed = false
+            try {
+                AvaWardrobeMediaRestoreTransaction.apply(
+                    f.root, f.journal, f.preview, "[]",
+                    readIndex = { newerIndex },
+                    writeIndex = { writes++; true },
+                    isOwnerAuthorized = { true }, audit = { _, _ -> true }
+                )
+            } catch (_: Exception) { failed = true }
+            assertTrue(failed)
+            assertEquals(0, writes)
+            assertFalse(File(f.root, f.preview.entries.single().fileName).exists())
+            assertFalse(File(f.journal, "ava-wardrobe-media-restore-journal.json").exists())
+        } finally { f.base.deleteRecursively() }
+    }
+
+    @Test fun recoveryRefusesToDeleteFileWithUnexpectedDigest() {
+        val f = fixture()
+        try {
+            val entry = f.preview.entries.single()
+            val collision = File(f.root, entry.fileName).apply { writeBytes("unrelated file".toByteArray()) }
+            val journalFile = File(f.journal, "ava-wardrobe-media-restore-journal.json")
+            val oldDigest = MessageDigest.getInstance("SHA-256")
+                .digest("[]".toByteArray(Charsets.UTF_8))
+                .joinToString("") { "%02x".format(it.toInt() and 0xff) }
+            JSONObject()
+                .put("version", 1)
+                .put("transactionId", UUID.randomUUID().toString())
+                .put("oldIndexSha256", oldDigest)
+                .put("nextIndexSha256", "c".repeat(64))
+                .put("stageDirectory", "ava-wardrobe-restore-${UUID.randomUUID()}.stage")
+                .put("promotedFiles", JSONArray().put(
+                    JSONObject().put("name", entry.fileName).put("sha256", entry.sha256)
+                ))
+                .also { journalFile.writeText(it.toString()) }
+            val recovered = AvaWardrobeMediaRestoreTransaction.recover(
+                f.root, f.journal, readIndex = { "[]" },
+                isOwnerAuthorized = { true }, audit = { _, _ -> true }
+            )
+            assertFalse(recovered)
+            assertTrue(collision.isFile)
+            assertTrue(journalFile.isFile)
+        } finally { f.base.deleteRecursively() }
+    }
+
     @Test fun recoveryFinishesCleanupWhenIndexCommitSucceededBeforeProcessExit() {
         val f = fixture()
         try {
