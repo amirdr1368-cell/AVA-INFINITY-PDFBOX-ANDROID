@@ -203,6 +203,7 @@ Tests and build remain unexecuted.
 Implemented on `ava/mobile-app-integration`:
 - The owner image save flow now records a dedicated audit authorization event before committing the updated encrypted preference index.
 - The strict owner-session policy is re-evaluated immediately before the sensitive index commit, so a session change during file processing stops the operation.
+- The accepted image filename pattern now requires a canonical UUIDv4 structure, not merely 36 hexadecimal-or-hyphen characters; a malformed-UUID rejection case was added.
 - Failure-path audit logging is best-effort and cannot throw a second exception out of the UI save handler.
 - The previous index string is retained during the operation. The new index is committed and immediately read back for exact equality verification.
 - If the index commit/read-back fails, the code attempts to restore the exact previous index and verifies that rollback.
@@ -210,7 +211,7 @@ Implemented on `ava/mobile-app-integration`:
 - This removes the previous ordering hazard where an audit failure after index commit could trigger image deletion while leaving a dangling index record.
 
 Verification:
-- Source was committed and should be read back from GitHub before treating the change as verified.
+- Updated source and tests were fetched back from GitHub after commit and inspected.
 - Unit tests, Gradle tasks, APK build and GitHub Actions remain unexecuted.
 - This is a local save-transaction hardening only. It does not implement media export, encrypted media backup, or restore.
 
