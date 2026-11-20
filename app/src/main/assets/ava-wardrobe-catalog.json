@@ -1,0 +1,1169 @@
+{
+  "schemaVersion": 1,
+  "project": "AVA INFINITY",
+  "updated": "2026-11-20",
+  "approvalScope": "Only explicitly approved designs are included. Numeric gaps are intentionally reserved for proposals without clear approval.",
+  "privacy": {
+    "category": "private",
+    "access": "owner_only",
+    "publicUiLabel": "مجموعه خصوصی",
+    "requiresOwnerReauthentication": true
+  },
+  "counts": {
+    "approvedNumberedDesigns": 123,
+    "visualAssetsPending": 123,
+    "approvedCoreLooks": 4
+  },
+  "items": [
+    {
+      "id": 1,
+      "name": "Royal Lilac Mini",
+      "category": "private",
+      "type": "mini_set",
+      "description": "ست کوتاه یاسی سلطانی با تاپ هماهنگ",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 2,
+      "name": "Floral Lace",
+      "category": "private",
+      "type": "lingerie_set",
+      "description": "ست سوتین و شورت توری با طرح گل",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 3,
+      "name": "Fantasy Tulle",
+      "category": "private",
+      "type": "fantasy_set",
+      "description": "ست دوتکه فانتزی با دامن کوتاه تور",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 4,
+      "name": "Satin Mini",
+      "category": "private",
+      "type": "nightwear",
+      "description": "لباس کوتاه ساتن",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 5,
+      "name": "Floral Lace",
+      "category": "private",
+      "type": "lingerie_set",
+      "description": "ست توری گل‌دار",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 6,
+      "name": "Royal Corset",
+      "category": "private",
+      "type": "corset_set",
+      "description": "ست کرستی یاسی سلطانی",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 7,
+      "name": "Fairy Lilac",
+      "category": "private",
+      "type": "fantasy_set",
+      "description": "ست فانتزی یاسی لطیف",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 8,
+      "name": "Rose Satin",
+      "category": "private",
+      "type": "satin_set",
+      "description": "ست ساتن رزگلد",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 9,
+      "name": "Infinity Straps",
+      "category": "private",
+      "type": "lingerie_set",
+      "description": "ست بنددار با طراحی نماد بی‌نهایت",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 10,
+      "name": "Lilac Push-Up",
+      "category": "private",
+      "type": "lingerie_set",
+      "description": "ست یاسی با سوتین پوش‌آپ",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 11,
+      "name": "Rose Balconette",
+      "category": "private",
+      "type": "lingerie_set",
+      "description": "ست رز با طراحی بالکنته",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 12,
+      "name": "Deep Plunge",
+      "category": "private",
+      "type": "lingerie_set",
+      "description": "ست با یقه عمیق",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 13,
+      "name": "Lace Push-Up",
+      "category": "private",
+      "type": "lingerie_set",
+      "description": "ست توری پوش‌آپ",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 14,
+      "name": "Satin Sculpt",
+      "category": "private",
+      "type": "shapewear_set",
+      "description": "ست ساتن فرم‌دهنده",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 15,
+      "name": "Soft Shape",
+      "category": "private",
+      "type": "lingerie_set",
+      "description": "ست نرم با فرم طبیعی",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 16,
+      "name": "Invisible Mesh",
+      "category": "private",
+      "type": "lingerie_set",
+      "description": "ست مش ظریف",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 17,
+      "name": "Clear Touch",
+      "category": "private",
+      "type": "lingerie_set",
+      "description": "ست با پارچه سبک و ظریف",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 18,
+      "name": "Sheer Lilac",
+      "category": "private",
+      "type": "lingerie_set",
+      "description": "ست یاسی نیمه‌شفاف",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 19,
+      "name": "Second Skin",
+      "category": "private",
+      "type": "bodysuit",
+      "description": "بادی نرم و چسبان",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 20,
+      "name": "Lavender Babydoll",
+      "category": "private",
+      "type": "sleepwear",
+      "description": "لباس خواب یاسی با جزئیات رزگلد",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 21,
+      "name": "Midnight Fantasy",
+      "category": "private",
+      "type": "sleepwear",
+      "description": "لباس خواب تیره با طراحی فانتزی",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 23,
+      "name": "Rose Gold Fantasy",
+      "category": "private",
+      "type": "fantasy_set",
+      "description": "ست فانتزی با جزئیات رزگلد",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 47,
+      "name": "Sweetheart Neckline",
+      "category": "private",
+      "type": "top",
+      "description": "تاپ با یقه قلبی",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 48,
+      "name": "Bustier Top",
+      "category": "private",
+      "type": "top",
+      "description": "تاپ بوستیه",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 49,
+      "name": "Balconette Cut",
+      "category": "private",
+      "type": "lingerie_top",
+      "description": "طراحی بالکنته",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 50,
+      "name": "Ruched Bust",
+      "category": "private",
+      "type": "lingerie_top",
+      "description": "طراحی چین‌دار در قسمت بالاتنه",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 51,
+      "name": "Sculpted Bodysuit",
+      "category": "private",
+      "type": "bodysuit",
+      "description": "بادی با خطوط فرم‌دهنده",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 52,
+      "name": "Off-Shoulder Mini",
+      "category": "private",
+      "type": "dress",
+      "description": "پیراهن کوتاه شانه‌باز",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 53,
+      "name": "Halter Chic",
+      "category": "private",
+      "type": "dress",
+      "description": "لباس با یقه هالتر",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 54,
+      "name": "Satin Slip",
+      "category": "private",
+      "type": "sleepwear",
+      "description": "لباس خواب ساتن",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 55,
+      "name": "Cutout Glam",
+      "category": "private",
+      "type": "dress",
+      "description": "لباس با برش‌های هندسی ظریف",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 56,
+      "name": "Velvet Night",
+      "category": "private",
+      "type": "sleepwear",
+      "description": "لباس خواب مخمل",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 57,
+      "name": "Lace Illusion",
+      "category": "private",
+      "type": "dress",
+      "description": "لباس با جزئیات توری",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 58,
+      "name": "Feather Dream",
+      "category": "private",
+      "type": "fantasy_set",
+      "description": "ست فانتزی با جزئیات پر",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 59,
+      "name": "Metallic Star",
+      "category": "private",
+      "type": "fantasy_set",
+      "description": "ست متالیک درخشان",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 60,
+      "name": "Princess Fantasy",
+      "category": "private",
+      "type": "fantasy_set",
+      "description": "ست فانتزی شاهزاده‌وار",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 61,
+      "name": "Midnight Rose",
+      "category": "private",
+      "type": "sleepwear",
+      "description": "لباس خواب تیره با جزئیات رز",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 62,
+      "name": "Stardust",
+      "category": "private",
+      "type": "fantasy_set",
+      "description": "ست فانتزی با درخشش ستاره‌ای",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 63,
+      "name": "Lavender Wrap",
+      "category": "private",
+      "type": "dress",
+      "description": "لباس یاسی چپ‌وراستی",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 64,
+      "name": "Romantic Muse",
+      "category": "private",
+      "type": "dress",
+      "description": "لباس رمانتیک با جزئیات لطیف",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 65,
+      "name": "Velvet Muse",
+      "category": "private",
+      "type": "dress",
+      "description": "لباس مخمل خوش‌فرم",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 66,
+      "name": "Lilac Executive",
+      "category": "private",
+      "type": "dress",
+      "description": "استایل رسمی یاسی",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 67,
+      "name": "Rose Champagne",
+      "category": "private",
+      "type": "dress",
+      "description": "لباس شامپاینی با جزئیات رزگلد",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 68,
+      "name": "Oversize Lilac",
+      "category": "everyday",
+      "type": "streetwear",
+      "description": "استایل اورسایز یاسی",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 69,
+      "name": "Baggy Cargo",
+      "category": "everyday",
+      "type": "streetwear",
+      "description": "شلوار بگ کارگو",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 70,
+      "name": "Urban Loose",
+      "category": "everyday",
+      "type": "streetwear",
+      "description": "استایل آزاد شهری",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 71,
+      "name": "Hoodie & Biker",
+      "category": "sporty",
+      "type": "sportswear",
+      "description": "هودی با شورتک بایکر",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 72,
+      "name": "Sheer Layer",
+      "category": "formal",
+      "type": "layering",
+      "description": "لایه رویی سبک و نیمه‌شفاف",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 73,
+      "name": "Organza Glow",
+      "category": "formal",
+      "type": "dress",
+      "description": "لباس ارگانزا با درخشش لطیف",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 74,
+      "name": "Midnight Mesh",
+      "category": "formal",
+      "type": "dress",
+      "description": "لباس مش تیره با طراحی شبانه",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 75,
+      "name": "Denim Queen",
+      "category": "everyday",
+      "type": "denim",
+      "description": "کت جین لش، شلوار بگ و تاپ یاسی",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 76,
+      "name": "Rebel Rose",
+      "category": "everyday",
+      "type": "leather",
+      "description": "کت چرم با دامن کوتاه و بوت",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 77,
+      "name": "Leather Chic",
+      "category": "everyday",
+      "type": "leather",
+      "description": "شلوار چرم آزاد با بادی هماهنگ",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 78,
+      "name": "Denim Mini",
+      "category": "everyday",
+      "type": "denim",
+      "description": "دامن جین کوتاه با پیراهن اورسایز",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 79,
+      "name": "Burgundy Edge",
+      "category": "formal",
+      "type": "dress",
+      "description": "پیراهن چرم زرشکی با برش مدرن",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 80,
+      "name": "Soft Knit",
+      "category": "everyday",
+      "type": "knitwear",
+      "description": "پلیور بافت لش با دامن کوتاه",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 81,
+      "name": "Knit Silhouette",
+      "category": "everyday",
+      "type": "knitwear",
+      "description": "پیراهن بافت جذب",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 82,
+      "name": "Cozy Knit Set",
+      "category": "homewear",
+      "type": "knitwear",
+      "description": "کاردیگان و شورتک بافتنی",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 83,
+      "name": "Varsity Girl",
+      "category": "sporty",
+      "type": "sportswear",
+      "description": "کت ورزشی دانشگاهی، شورتک و کتانی",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 84,
+      "name": "Active Lilac",
+      "category": "sporty",
+      "type": "sportswear",
+      "description": "کت زیپ‌دار جذب با لگ ورزشی",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 85,
+      "name": "Sporty Preppy",
+      "category": "sporty",
+      "type": "sportswear",
+      "description": "سویشرت لش با دامن پلیسه کوتاه",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 86,
+      "name": "Pilates Muse",
+      "category": "sporty",
+      "type": "sportswear",
+      "description": "تاپ ورزشی و لگ دمپاگشاد",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 87,
+      "name": "Street Rebel",
+      "category": "sporty",
+      "type": "streetwear",
+      "description": "بامبر اورسایز با شلوار جاگر کارگو",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 88,
+      "name": "Tennis Princess",
+      "category": "sporty",
+      "type": "sportswear",
+      "description": "پیراهن ورزشی تنیس یاسی با کتانی سفید",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 89,
+      "name": "Royal Tweed",
+      "category": "formal",
+      "type": "suit",
+      "description": "کت کوتاه و دامن تویید یاسی",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 90,
+      "name": "Satin Palazzo",
+      "category": "formal",
+      "type": "set",
+      "description": "شلوار ساتن آزاد با تاپ خوش‌فرم",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 91,
+      "name": "Blazer Dress",
+      "category": "formal",
+      "type": "dress",
+      "description": "پیراهن کت‌مانند کوتاه با کمربند",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 92,
+      "name": "Champagne Glow",
+      "category": "formal",
+      "type": "evening_dress",
+      "description": "لباس شب شامپاینی ریزش‌دار",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 93,
+      "name": "Royal Evening",
+      "category": "formal",
+      "type": "evening_dress",
+      "description": "پیراهن بلند ساتن یاسی شانه‌باز",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 94,
+      "name": "Pearl Lavender",
+      "category": "formal",
+      "type": "dress",
+      "description": "پیراهن کوتاه تویید یاسی با مروارید",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 95,
+      "name": "Plum Affair",
+      "category": "formal",
+      "type": "cocktail_dress",
+      "description": "پیراهن کوتاه ساتن آلویی",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 96,
+      "name": "Noir Elegance",
+      "category": "formal",
+      "type": "dress",
+      "description": "لباس مشکی توری با طراحی بالغ",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 97,
+      "name": "Champagne Silk",
+      "category": "formal",
+      "type": "slip_dress",
+      "description": "پیراهن ساتن شامپاینی",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 98,
+      "name": "Burgundy Muse",
+      "category": "formal",
+      "type": "cocktail_dress",
+      "description": "لباس مخمل زرشکی شانه‌باز",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 99,
+      "name": "Royal Corset",
+      "category": "formal",
+      "type": "evening_dress",
+      "description": "لباس کرستی یاسی با جزئیات رزگلد",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 100,
+      "name": "Midnight Silk",
+      "category": "private",
+      "type": "sleepwear_set",
+      "description": "ست ساتن مشکی با روبدوشامبر",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 101,
+      "name": "Lavender Luxe",
+      "category": "private",
+      "type": "robe_set",
+      "description": "روبدوشامبر ساتن یاسی با حاشیه توری",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 102,
+      "name": "Rose Champagne",
+      "category": "private",
+      "type": "loungewear",
+      "description": "ست ساتن شامپاینی",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 103,
+      "name": "Velvet Kiss",
+      "category": "private",
+      "type": "dress",
+      "description": "پیراهن مخمل آلویی آستین‌بلند",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 104,
+      "name": "Lilac Muse",
+      "category": "private",
+      "type": "bodysuit",
+      "description": "بادی یاسی توری با شلوار هماهنگ",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 105,
+      "name": "Midnight Rose",
+      "category": "private",
+      "type": "robe_set",
+      "description": "روبدوشامبر مشکی ساتن با جزئیات رزگلد",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 106,
+      "name": "Royal Temptation",
+      "category": "private",
+      "type": "dress",
+      "description": "پیراهن کوتاه یاسی با یقه باز",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 107,
+      "name": "Golden Hour",
+      "category": "formal",
+      "type": "evening_dress",
+      "description": "پیراهن ساتن رزگلد مینیمال",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 108,
+      "name": "One Shoulder",
+      "category": "formal",
+      "type": "cocktail_dress",
+      "description": "پیراهن یاسی تک‌شانه",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 109,
+      "name": "Satin Flow",
+      "category": "formal",
+      "type": "midi_dress",
+      "description": "پیراهن ساتن با یقه آبشاری",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 110,
+      "name": "Velvet Noir",
+      "category": "formal",
+      "type": "evening_dress",
+      "description": "لباس مخمل مشکی با پشت باز",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 111,
+      "name": "Starlight Glam",
+      "category": "formal",
+      "type": "cocktail_dress",
+      "description": "پیراهن کوتاه پولک‌دوزی یاسی",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 112,
+      "name": "Champagne Wrap",
+      "category": "formal",
+      "type": "dress",
+      "description": "پیراهن ساتن چپ‌وراستی",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 113,
+      "name": "Burgundy Lace",
+      "category": "formal",
+      "type": "dress",
+      "description": "لباس زرشکی با آستین توری",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 114,
+      "name": "Infinity Queen",
+      "category": "formal",
+      "type": "evening_dress",
+      "description": "پیراهن بلند یاسی با جزئیات رزگلد",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 115,
+      "name": "Ruched Curve",
+      "category": "everyday",
+      "type": "bodycon_dress",
+      "description": "پیراهن جذب با چین‌های ظریف پشت",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 116,
+      "name": "Sculpt Fit",
+      "category": "sporty",
+      "type": "leggings",
+      "description": "لگ فاق‌بلند فرم‌دهنده",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 117,
+      "name": "Royal Pencil",
+      "category": "formal",
+      "type": "skirt",
+      "description": "دامن مدادی خوش‌فرم",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 118,
+      "name": "Second Skin",
+      "category": "everyday",
+      "type": "knit_dress",
+      "description": "پیراهن بافت کشی",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 119,
+      "name": "Silhouette",
+      "category": "formal",
+      "type": "trousers",
+      "description": "شلوار پارچه‌ای خوش‌دوخت و کمر بلند",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 120,
+      "name": "Satin Curve",
+      "category": "formal",
+      "type": "skirt",
+      "description": "دامن ساتن با چین و برش منحنی",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 121,
+      "name": "Infinity Shape",
+      "category": "formal",
+      "type": "bodycon_dress",
+      "description": "پیراهن خوش‌فرم با درزهای منحنی",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 122,
+      "name": "Royal Ruched",
+      "category": "everyday",
+      "type": "bodycon_dress",
+      "description": "پیراهن جذب با چین‌های کناری و پشت",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 123,
+      "name": "Sculpt Leggings",
+      "category": "sporty",
+      "type": "leggings",
+      "description": "لگ فاق‌بلند با دوخت فرم‌دهنده",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 124,
+      "name": "Peplum Curve",
+      "category": "formal",
+      "type": "dress",
+      "description": "پیراهن با کمر مشخص و دامن خوش‌فرم",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 125,
+      "name": "Noir Silhouette",
+      "category": "formal",
+      "type": "midi_dress",
+      "description": "پیراهن مشکی جذب با دوخت منحنی",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 126,
+      "name": "Lilac Hourglass",
+      "category": "formal",
+      "type": "skirt",
+      "description": "دامن مدادی یاسی با کمر بلند",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 127,
+      "name": "Velvet Contour",
+      "category": "everyday",
+      "type": "jumpsuit",
+      "description": "سرهمی کشی با خطوط برش فرم‌دهنده",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 128,
+      "name": "Infinity Back",
+      "category": "formal",
+      "type": "midi_dress",
+      "description": "پیراهن میدی یاسی با پشت باز ظریف",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 129,
+      "name": "Royal Backfit",
+      "category": "everyday",
+      "type": "bodycon_dress",
+      "description": "پیراهن کوتاه یاسی با چین پشت",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 130,
+      "name": "Plum Sculpt",
+      "category": "sporty",
+      "type": "leggings",
+      "description": "لگ فاق‌بلند با دوخت فرم‌دهنده",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 131,
+      "name": "Lilac Contour",
+      "category": "everyday",
+      "type": "knit_dress",
+      "description": "پیراهن بافت جذب با خطوط منحنی",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 132,
+      "name": "Midnight Curve",
+      "category": "formal",
+      "type": "dress",
+      "description": "پیراهن ساتن مشکی با پشت باز",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 133,
+      "name": "Burgundy Shape",
+      "category": "formal",
+      "type": "skirt",
+      "description": "دامن مدادی زرشکی با برش خوش‌فرم",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 134,
+      "name": "Infinity Fit",
+      "category": "sporty",
+      "type": "jumpsuit",
+      "description": "سرهمی یاسی با دوخت‌های فرم‌دهنده",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 135,
+      "name": "Royal Silhouette",
+      "category": "formal",
+      "type": "midi_dress",
+      "description": "پیراهن میدی یاسی با کمر مشخص و برش منحنی پشت",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 136,
+      "name": "Lilac Moon",
+      "category": "private",
+      "type": "sleepwear",
+      "description": "لباس خواب بلند ساتن یاسی با حاشیه ظریف",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 137,
+      "name": "Burgundy Lace",
+      "category": "private",
+      "type": "bodysuit",
+      "description": "بادی زرشکی با جزئیات توری",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 138,
+      "name": "Champagne Robe",
+      "category": "private",
+      "type": "robe",
+      "description": "کیمونوی ساتن شامپاینی",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 139,
+      "name": "Plum Whisper",
+      "category": "private",
+      "type": "loungewear",
+      "description": "ست راحتی ساتن آلویی",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 140,
+      "name": "Royal Lace",
+      "category": "private",
+      "type": "lingerie_set",
+      "description": "ست یاسی با توری ظریف",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 141,
+      "name": "Rose Infinity",
+      "category": "private",
+      "type": "nightdress",
+      "description": "لباس خواب ساتن رزگلد",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 142,
+      "name": "Royal Satin Set",
+      "category": "private",
+      "type": "sleepwear_set",
+      "description": "ست ساتن یاسی با روبدوشامبر هماهنگ",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 143,
+      "name": "Rose Gold Lace",
+      "category": "private",
+      "type": "lingerie_set",
+      "description": "ست توری شامپاینی با جزئیات رزگلد",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 144,
+      "name": "Plum Velvet",
+      "category": "private",
+      "type": "bodysuit",
+      "description": "بادی مخمل آلویی",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 145,
+      "name": "Lavender Dream",
+      "category": "private",
+      "type": "sleepwear",
+      "description": "لباس خواب یاسی با لایه‌های لطیف توری",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 146,
+      "name": "Midnight Silk Set",
+      "category": "private",
+      "type": "sleepwear_set",
+      "description": "ست ساتن مشکی با روبدوشامبر بلند",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 147,
+      "name": "Sculpted Rose",
+      "category": "private",
+      "type": "shapewear",
+      "description": "بادی فرم‌دهنده شامپاینی",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    }
+  ],
+  "coreLooks": [
+    {
+      "id": "core-sporty",
+      "name": "Royal Lilac Sport",
+      "category": "sporty",
+      "approval": "APPROVED_BY_AMIR",
+      "description": "سویشرت ورزشی کوتاه یاسی، لگ فاق‌بلند، کتانی سفید و جزئیات رزگلد",
+      "imageReference": "https://d1pzraxr35z0i4.cloudfront.net/media/97/71/c3/1743684058/OLAVOGA-sklep-komplet-CAPTAIN-MORGAN-012-pasuri-pl.webp?ts=1743684058",
+      "imageSource": "https://pasuri.pl/en/OLAVOGA-CAPTAIN-MORGAN-women-s-sports-set-Lila",
+      "assetStatus": "EXTERNAL_REFERENCE_ONLY"
+    },
+    {
+      "id": "core-everyday",
+      "name": "Soft Casual",
+      "category": "everyday",
+      "approval": "APPROVED_BY_AMIR",
+      "description": "کاردیگان کرم، تاپ سفید، شلوار بژ و کیف دوشی یاسی",
+      "imageReference": "https://api.fastretailing.com/ugc/v1/plst/jp/SR_IMAGES/ugc_stylehint_plst_jp_photo_240706_1379297_r-1000-1333",
+      "imageSource": "https://www.plst.com/jp/ja/stylingbook/stylehint/5550742",
+      "assetStatus": "EXTERNAL_REFERENCE_ONLY"
+    },
+    {
+      "id": "core-formal",
+      "name": "Royal Lilac Evening",
+      "category": "formal",
+      "approval": "APPROVED_BY_AMIR",
+      "description": "پیراهن میدی ساتن یاسی با کفش و اکسسوری رزگلد",
+      "imageReference": "https://elonnashop.com/cdn/shop/files/13f9a7e7f3b8a8b583ec36fc0cbf874e.jpg?v=1719305953",
+      "imageSource": "https://elonnashop.com/products/one-shoulder-split-thigh-satin-party-dresses",
+      "assetStatus": "EXTERNAL_REFERENCE_ONLY"
+    },
+    {
+      "id": "core-homewear",
+      "name": "Cozy Lilac Home",
+      "category": "homewear",
+      "approval": "APPROVED_BY_AMIR",
+      "description": "ست راحتی یاسی روشن با پارچه نرم و جزئیات صورتی",
+      "imageReference": "https://vybe.pk/cdn/shop/files/VYBENewPjsPackshotsLilac1.png?v=1769433686&width=1024",
+      "imageSource": "https://vybe.pk/products/cloud-pajama-set-lilac",
+      "assetStatus": "EXTERNAL_REFERENCE_ONLY"
+    }
+  ],
+  "imageAssetPolicy": "External image references are inspiration links only. They are not bundled local image files and must not be represented as downloaded assets."
+}

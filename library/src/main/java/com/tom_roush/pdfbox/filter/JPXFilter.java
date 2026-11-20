@@ -2,7 +2,7 @@
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
+ * The ASF licenses this file to you under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
@@ -26,8 +26,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import com.gemalto.jp2.JP2Decoder;
-import com.gemalto.jp2.JP2Encoder;
 import com.tom_roush.pdfbox.cos.COSDictionary;
 import com.tom_roush.pdfbox.cos.COSName;
 import com.tom_roush.pdfbox.io.IOUtils;
@@ -37,8 +35,9 @@ import com.tom_roush.pdfbox.pdmodel.graphics.color.PDJPXColorSpace;
  * Decompress data encoded using the wavelet-based JPEG 2000 standard,
  * reproducing the original data.
  *
- * Requires the JP2ForAndroid library to be available from com.gemalto.jp2:jp2-android:1.0.3, see
- * <a href="https://github.com/ThalesGroup/JP2ForAndroid">JP2ForAndroid</a>.
+ * JP2ForAndroid is an optional runtime dependency. When it is absent, JPX
+ * decoding and encoding fail with a clear MissingImageReaderException rather
+ * than making the PDFBox library itself depend on a retired artifact repository.
  *
  * @author John Hewson
  * @author Timo Boehme
@@ -46,6 +45,8 @@ import com.tom_roush.pdfbox.pdmodel.graphics.color.PDJPXColorSpace;
 public final class JPXFilter extends Filter
 {
     private static final int CACHE_SIZE = 1024;
+    private static final String JP2_DECODER = "com.gemalto.jp2.JP2Decoder";
+    private static final String JP2_ENCODER = "com.gemalto.jp2.JP2Encoder";
 
     /**
      * {@inheritDoc}
@@ -62,7 +63,7 @@ public final class JPXFilter extends Filter
         int[] pixels = new int[arrLen];
         image.getPixels(pixels, 0, image.getWidth(), 0, 0, image.getWidth(), image.getHeight());
 
-        // here we use a buffer to write batch to `decoded`, which makes it 10x faster than write byte one by one
+        // Batch writes to decoded; this is substantially faster than writing one byte at a time.
         byte[] buffer = new byte[CACHE_SIZE * 3];
         int pos = 0;
 
@@ -90,24 +91,24 @@ public final class JPXFilter extends Filter
         return decode(encoded, decoded, parameters, index, DecodeOptions.DEFAULT);
     }
 
-    // try to read using JP2ForAndroid
+    // Use reflection so the optional JP2ForAndroid codec is not a compile-time dependency.
     private Bitmap readJPX(InputStream input, DecodeOptions options, DecodeResult result) throws IOException
     {
+        final Bitmap image;
         try
         {
-            Class.forName("com.gemalto.jp2.JP2Decoder");
+            Class<?> decoderClass = Class.forName(JP2_DECODER);
+            Object decoder = decoderClass.getConstructor(InputStream.class).newInstance(input);
+            image = (Bitmap)decoderClass.getMethod("decode").invoke(decoder);
         }
         catch (ClassNotFoundException ex)
         {
             throw new MissingImageReaderException("Cannot read JPX image: JP2Android is not installed.");
         }
-
-        JP2Decoder decoder = new JP2Decoder(input);
-
-        // TODO: uncomment after upgrading JP2ForAndroid
-        // decoder.setSourceRegion(options.getSourceRegion());
-
-        Bitmap image = decoder.decode();
+        catch (ReflectiveOperationException ex)
+        {
+            throw new IOException("Unable to decode JPX image with JP2Android.", ex);
+        }
 
         COSDictionary parameters = result.getParameters();
 
@@ -145,7 +146,22 @@ public final class JPXFilter extends Filter
         throws IOException
     {
         Bitmap bitmap = BitmapFactory.decodeStream(input);
-        byte[] jpeBytes = new JP2Encoder(bitmap).encode();
+        final byte[] jpeBytes;
+        try
+        {
+            Class<?> encoderClass = Class.forName(JP2_ENCODER);
+            Object encoder = encoderClass.getConstructor(Bitmap.class).newInstance(bitmap);
+            jpeBytes = (byte[])encoderClass.getMethod("encode").invoke(encoder);
+        }
+        catch (ClassNotFoundException ex)
+        {
+            throw new MissingImageReaderException("Cannot write JPX image: JP2Android is not installed.");
+        }
+        catch (ReflectiveOperationException ex)
+        {
+            throw new IOException("Unable to encode JPX image with JP2Android.", ex);
+        }
+
         IOUtils.copy(new ByteArrayInputStream(jpeBytes), encoded);
         encoded.flush();
     }

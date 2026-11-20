@@ -46,6 +46,9 @@ public class PDFStreamParser extends BaseParser
     private final List<Object> streamObjects = new ArrayList<Object>( 100 );
 
     private static final int MAX_BIN_CHAR_TEST_LENGTH = 10;
+
+    /** Maximum encoded size of a single inline image. */
+    public static final int MAX_INLINE_IMAGE_BYTES = 4 * 1024 * 1024;
     private final byte[] binCharTestArr = new byte[MAX_BIN_CHAR_TEST_LENGTH];
 
     /**
@@ -292,6 +295,10 @@ public class PDFStreamParser extends BaseParser
                     hasNoFollowingBinData(seqSource)) &&
                     !seqSource.isEOF() )
                 {
+                    if (imageData.size() >= MAX_INLINE_IMAGE_BYTES)
+                    {
+                        throw new InlineImageLimitException(MAX_INLINE_IMAGE_BYTES);
+                    }
                     imageData.write( lastByte );
                     lastByte = currentByte;
                     currentByte = seqSource.read();

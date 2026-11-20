@@ -1,51 +1,38 @@
-PdfBox-Android
-==============
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.tom-roush/pdfbox-android/badge.svg?style=flat)](https://maven-badges.herokuapp.com/maven-central/com.tom-roush/pdfbox-android/)
-[![Build Status](https://github.com/TomRoush/PdfBox-Android/actions/workflows/android-ci.yml/badge.svg?branch=master)](https://github.com/TomRoush/PdfBox-Android/actions)
+# AVA INFINITY Mobile + PDFBox Android
 
-A port of Apache's PdfBox library to be usable on Android. Most features should be implemented by now. Feature requests can be added to the issue tracker. Stable releases can be added as a Gradle dependency from Maven Central.
+This repository contains the unified AVA INFINITY Android application and the PDFBox-Android library used by the app.
 
-The main code of this project is licensed under the Apache 2.0 License, found at http://www.apache.org/licenses/LICENSE-2.0.html
+## Modules
 
-Usage
-==============
+- `:app` — AVA INFINITY Android application (Kotlin).
+- `:library` — PDFBox-Android library, including the AVA inline-image memory guard.
+- `:sample` — original PDFBox demonstration app source, preserved but not included in the unified build.
 
-Add the following to dependency to `build.gradle`:
+## Build
 
-```gradle
-dependencies {
-    implementation 'com.tom-roush:pdfbox-android:2.0.27.0'
-}
+Requirements: JDK 17, Android SDK 35, Gradle 8.9.
+
+```bash
+./gradlew :app:testDebugUnitTest :library:testDebugUnitTest
+./gradlew :app:assembleDebug
 ```
 
-Before calls to PDFBox are made it is required to initialize the library's resource loader. Add the following line before calling PDFBox methods:
+Installable debug APK:
 
-```java
-PDFBoxResourceLoader.init(getApplicationContext());
-```
+`app/build/outputs/apk/debug/app-debug.apk`
 
-An example app is located in the `sample` directory and includes examples of common tasks.
+GitHub Actions runs the same tests and APK assembly on the `ava/**` integration branches and uploads the artifact named `AVA-INFINITY-APK`.
 
-Optional Dependencies
-==============
+## Project records
 
-PdfBox-Android can optionally make use of additional features provided by third-party libraries. These libraries are not included by default to reduce the size of the PdfBox-Android. See the `dependencies` section in the`build.gradle` of the Sample project for examples of including the optional dependencies.
+- [Unified mobile build and integration record](docs/BUILD-INTEGRATION-2026-11-20.md)
+- [AVA mobile implementation status](docs/AVA-MOBILE-IMPLEMENTATION-STATUS.md)
+- [GLASS UI 2.0 implementation status](docs/AVA-MOBILE-GLASS-UI-2.0-IMPLEMENTATION-STATUS.md)
+- [Approved UI 2.0 design](docs/AVA-MOBILE-UI-2.0-APPROVED.md)
+- [Project master change register](docs/PROJECT-MASTER-CHANGE-REGISTER.md)
+- [AVA wardrobe register and implementation status](docs/AVA-WARDROBE-REGISTER-2026-11-20.md)
+- [PDFBox upstream project](https://github.com/TomRoush/PdfBox-Android)
 
-Reading JPX Images
--------------
+## Licensing
 
-Android does not come with native support for handling JPX images. These images can be read using the [JP2Android library](https://github.com/ThalesGroup/JP2ForAndroid). As JPX is not a common image format, this library is not included with PdfBox-Android by default. If the JP2Android library is not on the classpath of your application, JPX images will be ignored and a warning will be logged.
-
-To include the JP2Android library, add the following to your project's Gradle `dependencies` section. Note that this library is available in JCenter only, so you will need to add `jcenter()` to your repository list.
-```gradle
-dependencies {
-    implementation 'com.gemalto.jp2:jp2-android:1.0.3'
-}
-```
-
-Important notes
-==============
-
-* Currently based on PDFBox v2.0.27
-
-* Requires API 19 or greater for full functionality
+The PDFBox library's existing Apache 2.0 license and NOTICE files are retained. AVA application source and project records are maintained separately within this repository.
