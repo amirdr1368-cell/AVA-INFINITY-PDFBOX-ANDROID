@@ -1614,6 +1614,7 @@ class MainActivity : Activity() {
             Toast.makeText(this, "ثبت امنیتی ناموفق بود؛ تصویر ذخیره نشد.", Toast.LENGTH_LONG).show()
             return
         }
+        var pendingImageFile: java.io.File? = null
         try {
             val directory = java.io.File(filesDir, "ava-wardrobe").apply { if (!exists() && !mkdirs()) error("Cannot create private image directory") }
             val extension = when (contentResolver.getType(uri)?.lowercase(Locale.ROOT)) {
@@ -1623,6 +1624,7 @@ class MainActivity : Activity() {
                 else -> ".jpg"
             }
             val destination = java.io.File(directory, "wardrobe_" + java.util.UUID.randomUUID().toString() + extension)
+            pendingImageFile = destination
             var total = 0L
             contentResolver.openInputStream(uri)?.use { input ->
                 java.io.FileOutputStream(destination).use { output ->
@@ -1654,12 +1656,15 @@ class MainActivity : Activity() {
                 saved.remove(saved.length() - 1)
                 prefs.edit().putString("owner_wardrobe_images", saved.toString()).commit()
                 destination.delete()
+                pendingImageFile = null
                 Toast.makeText(this, "ثبت امنیتی کامل نشد؛ تصویر جدید لغو شد.", Toast.LENGTH_LONG).show()
                 return
             }
+            pendingImageFile = null
             Toast.makeText(this, "تصویر به کمد آوا اضافه شد.", Toast.LENGTH_LONG).show()
             showPage("wardrobe")
         } catch (_: Exception) {
+            pendingImageFile?.delete()
             aacs.recordOwnerEvent("WARDROBE_IMAGE_SAVE_FAILED", "selected image could not be stored")
             Toast.makeText(this, "ذخیره تصویر انجام نشد؛ اطلاعات قبلی حفظ شدند. حجم مجاز هر عکس ۱۵ مگابایت است.", Toast.LENGTH_LONG).show()
         }
