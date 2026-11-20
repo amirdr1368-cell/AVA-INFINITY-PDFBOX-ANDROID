@@ -160,3 +160,23 @@ Not yet completed:
 - Existing image import still needs actual image signature/dimension validation and a versioned metadata/index migration before portable media export can safely proceed.
 
 This small authorization refactor does not change the behavior of the general backup controls and does not make wardrobe images portable yet.
+
+
+## 15. Import validation hardening progress (2026-11-20)
+
+Implemented on `ava/mobile-app-integration`:
+- Added pure Kotlin `AvaWardrobeImageFormat` signature detection for JPEG, PNG, GIF87a/GIF89a and WebP. Unsupported/truncated signatures are rejected.
+- Added JVM unit tests for supported signatures, both GIF variants, malformed RIFF/WebP markers and unknown/truncated inputs.
+- Changed owner image import to stream into a temporary `.pending` file with the existing 15 MiB cap, flush it to disk, detect the actual format from file bytes, and use the detected extension rather than trusting the provider MIME type.
+- Added Android bounds-only decode validation before indexing: dimensions must be positive, each edge at most 12,000 pixels, and total pixels at most 40 million.
+- The validated temporary file is renamed within the private wardrobe directory before its path is written to the encrypted preference index. Failed validation leaves the existing index unchanged and the pending file is deleted by the existing failure path.
+
+Commits:
+- `1ad375c31b68a51ee404edee960617077f42f8a8` image signature detector
+- `7b3c3a46d065a3457de52e315655f73708e43cea` detector unit tests
+- `4b0a1ed07d45072d34340939a667104906b201e5` import validation integration
+
+Verification status:
+- Source changes were committed through GitHub and are pending a final source read-back review.
+- Unit tests have not been executed. No Gradle test, APK build or GitHub Actions run has been performed.
+- Header detection plus Android bounds decoding is an import hardening step, not a complete hostile-file decoder sandbox. The portable media backup/restore feature remains unimplemented.
