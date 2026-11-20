@@ -1591,7 +1591,7 @@ class MainActivity : Activity() {
             if (!isCurrentOwnerMediaSession() ||
                 !aacs.recordOwnerEvent("WARDROBE_MEDIA_EXPORT_REQUESTED", "owner requested encrypted media companion")
             ) {
-                pass.fill('\\u0000')
+                pass.fill('\u0000')
                 Toast.makeText(this, "مجوز مالک یا ثبت امنیتی تأیید نشد؛ خروجی ساخته نشد.", Toast.LENGTH_LONG).show()
                 return@passwordDialog
             }
@@ -1697,7 +1697,7 @@ class MainActivity : Activity() {
         } finally {
             verificationStage?.stagingDirectory?.deleteRecursively()
             temporaryBundle.delete()
-            passphrase.fill('\\u0000')
+            passphrase.fill('\u0000')
         }
     }
 
@@ -1749,7 +1749,7 @@ class MainActivity : Activity() {
                 Toast.makeText(this, "پشتیبان معتبر نبود یا بررسی آن کامل نشد؛ هیچ تصویر فعلی تغییر نکرد.", Toast.LENGTH_LONG).show()
             } finally {
                 staged?.stagingDirectory?.deleteRecursively()
-                pass.fill('\\u0000')
+                pass.fill('\u0000')
             }
         }
     }
@@ -4044,7 +4044,7 @@ class MainActivity : Activity() {
                 pendingWardrobePhotoCategory = null
             }
             if (requestCode == 5401) {
-                pendingWardrobeMediaExportPassphrase?.fill('\\u0000')
+                pendingWardrobeMediaExportPassphrase?.fill('\u0000')
                 pendingWardrobeMediaExportPassphrase = null
             }
             if (requestCode == 5101) {
