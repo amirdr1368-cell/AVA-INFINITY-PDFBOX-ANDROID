@@ -28,7 +28,7 @@ class AvaWardrobeMediaPolicyTest {
         val base = java.nio.file.Files.createTempDirectory("ava-wardrobe-test").toFile()
         try {
             val root = java.io.File(base, "ava-wardrobe").apply { mkdirs() }
-            val valid = java.io.File(root, "wardrobe_123e4567-e89b-12d3-a456-426614174000.jpg")
+            val valid = java.io.File(root, "wardrobe_123e4567-e89b-42d3-a456-426614174000.jpg")
                 .apply { writeBytes(byteArrayOf(1, 2, 3)) }
             assertTrue(AvaWardrobeMediaPolicy.isSafeImageFile(root, valid))
 
