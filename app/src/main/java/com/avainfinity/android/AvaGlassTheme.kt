@@ -20,8 +20,8 @@ object AvaGlassTheme {
     val Lavender300: Int = Color.rgb(216, 188, 232)
     val RoseGold500: Int = Color.rgb(197, 142, 134)
     val RoseGold300: Int = Color.rgb(224, 182, 169)
-    val DarkPrimaryText: Int = Color.rgb(247, 240, 250)
-    val DarkSecondaryText: Int = Color.rgb(200, 185, 209)
+    val DarkPrimaryText: Int = Color.rgb(242, 247, 251)
+    val DarkSecondaryText: Int = Color.rgb(177, 194, 209)
     val LightPrimaryText: Int = Color.rgb(41, 29, 49)
     val LightSecondaryText: Int = Color.rgb(103, 84, 111)
     val StatusSuccess: Int = Color.rgb(156, 205, 177)
@@ -91,7 +91,7 @@ object AvaGlassTheme {
         val stroke = if (light) {
             Color.argb(175, 190, 150, 205)
         } else {
-            Color.argb(105, 216, 188, 232)
+            Color.argb(125, 135, 205, 235)
         }
         return GradientDrawable().apply {
             setColor(fill)
