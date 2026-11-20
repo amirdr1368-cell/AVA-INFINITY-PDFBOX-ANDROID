@@ -1641,17 +1641,12 @@ class MainActivity : Activity() {
         var pendingImageFile: java.io.File? = null
         try {
             val directory = java.io.File(filesDir, "ava-wardrobe").apply { if (!exists() && !mkdirs()) error("Cannot create private image directory") }
-            val extension = when (contentResolver.getType(uri)?.lowercase(Locale.ROOT)) {
-                "image/png" -> ".png"
-                "image/webp" -> ".webp"
-                "image/gif" -> ".gif"
-                else -> ".jpg"
-            }
-            val destination = java.io.File(directory, "wardrobe_" + java.util.UUID.randomUUID().toString() + extension)
-            pendingImageFile = destination
+            val fileId = java.util.UUID.randomUUID().toString()
+            val temporary = java.io.File(directory, "wardrobe_$fileId.pending")
+            pendingImageFile = temporary
             var total = 0L
             contentResolver.openInputStream(uri)?.use { input ->
-                java.io.FileOutputStream(destination).use { output ->
+                java.io.FileOutputStream(temporary).use { output ->
                     val buffer = ByteArray(8192)
                     while (true) {
                         val count = input.read(buffer)
@@ -1660,8 +1655,25 @@ class MainActivity : Activity() {
                         if (total > 15L * 1024L * 1024L) error("Image exceeds 15 MB")
                         output.write(buffer, 0, count)
                     }
+                    output.fd.sync()
                 }
             } ?: error("Unable to read selected image")
+
+            val header = ByteArray(12)
+            val headerBytes = java.io.FileInputStream(temporary).use { it.read(header) }
+            val format = AvaWardrobeImageFormat.detect(header.copyOf(maxOf(0, headerBytes)))
+                ?: error("Unsupported or invalid image signature")
+            val bounds = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
+            android.graphics.BitmapFactory.decodeFile(temporary.absolutePath, bounds)
+            val width = bounds.outWidth
+            val height = bounds.outHeight
+            if (width <= 0 || height <= 0 || width > 12000 || height > 12000 ||
+                width.toLong() * height.toLong() > 40_000_000L
+            ) error("Image dimensions are invalid or exceed the safe limit")
+
+            val destination = java.io.File(directory, "wardrobe_$fileId" + format.extension)
+            if (!temporary.renameTo(destination)) error("Unable to finalize validated image")
+            pendingImageFile = destination
             val saved = org.json.JSONArray(prefs.getString("owner_wardrobe_images", "[]") ?: "[]")
             val categoryLabel = when (category) {
                 "sporty" -> "اسپرت"
