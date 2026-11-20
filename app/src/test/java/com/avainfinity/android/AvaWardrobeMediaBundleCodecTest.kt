@@ -41,7 +41,7 @@ class AvaWardrobeMediaBundleCodecTest {
 
             val stagingParent = File(base, "staging").apply { mkdirs() }
             val preview = AvaWardrobeMediaBundleCodec.decryptToStaging(
-                ByteArrayInputStream(encrypted), stagingParent, passphrase.copyOf()
+                ByteArrayInputStream(encrypted), stagingParent, passphrase.copyOf(), validateStagedImage = { true }
             )
             assertEquals(2, preview.entries.size)
             assertEquals(26L, preview.totalBytes)
@@ -71,7 +71,7 @@ class AvaWardrobeMediaBundleCodecTest {
             var failed = false
             try {
                 AvaWardrobeMediaBundleCodec.decryptToStaging(
-                    ByteArrayInputStream(output.toByteArray()), stagingParent, "wrong password".toCharArray()
+                    ByteArrayInputStream(output.toByteArray()), stagingParent, "wrong password".toCharArray(), validateStagedImage = { true }
                 )
             } catch (_: Exception) { failed = true }
             assertTrue(failed)
@@ -99,7 +99,7 @@ class AvaWardrobeMediaBundleCodecTest {
             var failed = false
             try {
                 AvaWardrobeMediaBundleCodec.decryptToStaging(
-                    ByteArrayInputStream(damaged), stagingParent, passphrase.copyOf()
+                    ByteArrayInputStream(damaged), stagingParent, passphrase.copyOf(), validateStagedImage = { true }
                 )
             } catch (_: Exception) { failed = true }
             assertTrue(failed)
@@ -127,7 +127,7 @@ class AvaWardrobeMediaBundleCodecTest {
             var failed = false
             try {
                 AvaWardrobeMediaBundleCodec.decryptToStaging(
-                    ByteArrayInputStream(truncated), stagingParent, passphrase.copyOf()
+                    ByteArrayInputStream(truncated), stagingParent, passphrase.copyOf(), validateStagedImage = { true }
                 )
             } catch (_: Exception) { failed = true }
             assertTrue(failed)
