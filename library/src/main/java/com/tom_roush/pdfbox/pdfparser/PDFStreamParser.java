@@ -295,7 +295,7 @@ public class PDFStreamParser extends BaseParser
                     hasNoFollowingBinData(seqSource)) &&
                     !seqSource.isEOF() )
                 {
-                    if (imageData.size() >= MAX_INLINE_IMAGE_BYTES)
+                    if (imageData.size() > MAX_INLINE_IMAGE_BYTES)
                     {
                         throw new InlineImageLimitException(MAX_INLINE_IMAGE_BYTES);
                     }
