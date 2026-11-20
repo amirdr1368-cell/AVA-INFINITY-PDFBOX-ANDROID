@@ -1423,8 +1423,8 @@ class MainActivity : Activity() {
         }
 
         val heading = card()
-        heading.addView(text("AVA PRIVATE WARDROBE", 20f, accent, true))
-        heading.addView(label("کاتالوگ خصوصی لباس‌های تأییدشده آوا • دسترسی فقط برای مالک", 12f)
+        heading.addView(text("AVA INFINITY WARDROBE", 20f, accent, true))
+        heading.addView(label("همه مجموعه‌های تأییدشده آوا • بخش خصوصی فقط برای مالک قابل مشاهده است", 12f)
             .apply { setPadding(0, dp(6), 0, 0) })
         body.addView(heading)
 
@@ -1434,16 +1434,44 @@ class MainActivity : Activity() {
             if (catalog.optInt("schemaVersion", -1) != 1) throw IllegalStateException("Unsupported wardrobe schema")
             val items = catalog.optJSONArray("items") ?: throw IllegalStateException("Missing wardrobe items")
             var shown = 0
+            val coreLooks = catalog.optJSONArray("coreLooks") ?: org.json.JSONArray()
+            if (coreLooks.length() > 0) {
+                body.addView(label("استایل‌های پایه", 15f, accent).apply { setPadding(0, dp(12), 0, dp(2)) })
+                for (index in 0 until coreLooks.length()) {
+                    val item = coreLooks.optJSONObject(index) ?: continue
+                    if (item.optString("approval") != "APPROVED_BY_AMIR") continue
+                    val name = item.optString("name").trim()
+                    val description = item.optString("description").trim()
+                    if (name.isBlank() || description.isBlank()) continue
+                    val entry = card().apply { setMarginsCompat(top = 8) }
+                    entry.addView(text(name, 16f, accent, true))
+                    entry.addView(label(description, 13f).apply { setPadding(0, dp(5), 0, 0) })
+                    body.addView(entry)
+                    shown++
+                }
+            }
+            val categoryLabels = mapOf(
+                "private" to "مجموعه خصوصی",
+                "sporty" to "اسپرت",
+                "everyday" to "روزمره",
+                "formal" to "رسمی و شب",
+                "homewear" to "لباس راحتی"
+            )
+            var lastCategory = ""
             for (index in 0 until items.length()) {
                 val item = items.optJSONObject(index) ?: continue
-                if (item.optString("category") != "private" ||
-                    item.optString("approval") != "APPROVED_BY_AMIR"
-                ) continue
+                if (item.optString("approval") != "APPROVED_BY_AMIR") continue
                 val id = item.optInt("id", -1)
                 val name = item.optString("name").trim()
                 val description = item.optString("description").trim()
+                val category = item.optString("category").trim()
                 if (id <= 0 || name.isBlank() || description.isBlank()) continue
-                val entry = card().apply { setMarginsCompat(top = 9) }
+                if (category != lastCategory) {
+                    body.addView(label(categoryLabels[category] ?: "سایر مدل‌ها", 15f, accent)
+                        .apply { setPadding(0, dp(14), 0, dp(2)) })
+                    lastCategory = category
+                }
+                val entry = card().apply { setMarginsCompat(top = 8) }
                 entry.addView(text("$id. $name", 16f, accent, true))
                 entry.addView(label(description, 13f).apply { setPadding(0, dp(5), 0, 0) })
                 entry.addView(label("تأیید طراحی: امیر • تصویر نهایی: در انتظار تهیه", 10f)
