@@ -285,13 +285,18 @@ Commits:
 - `57c48824eddbb5e0066f9d558f7286045582f103` bounded Android image decoder validator
 - `1b326322fabf6eae82a5932ca4bebcf978d0b3b5` apply decoder validation when saving owner images
 - `046bda95d3e5665e60bb649104fd20bb4da0c6d2` explicit AES-GCM final-tag verification during streaming decryption
+- `19368acaa563da887f66cc7eefb19851e503919d` owner-only export and authenticated restore-preview UI
+- `4a9cddc6bb38be1c04d0a2597e85e0bf6de70914` passphrase buffer clearing literal correction
+- `af49e40254499f1ca97d3e12c74fc1685e9e74aa` document export and preview UI behavior
+- `c6ae23de20c6b2d25176b4f4d8d41116a68d3894` export cleanup and non-empty bundle guard
+- `8b22bc6fc364f5921d772b79d79815c47d9970f1` preview line breaks and SAF cancellation secret cleanup
 - `0bea2f50a3f4618dad84d94b8128bef4f2cd03fc` explicit test callback updates
 
 Verification status:
 - Codec and tests were fetched back from GitHub and inspected.
 - Six JVM tests are present for multi-format round trip, wrong passphrase, authentication-tag tampering, truncation, unsafe export path, duplicate IDs, and platform decoder rejection cleanup.
 - Tests have not been executed. No Gradle task, APK build or GitHub Actions workflow has been run.
-- No UI export/restore flow is wired to this codec yet.
+- Owner-only export and authenticated restore-preview UI are now wired to the codec; applying a restore is still not implemented.
 
 
 ### Owner-only export and authenticated preview UI
