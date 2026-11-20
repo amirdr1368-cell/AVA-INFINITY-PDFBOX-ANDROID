@@ -49,7 +49,10 @@ object AvaWardrobeMediaRestoreTransaction {
         for (i in 0 until current.length()) {
             val record = current.optJSONObject(i) ?: error("Current wardrobe index contains an invalid record.")
             val id = record.optString("itemId")
-            if (id.isNotBlank()) require(byId.put(id, record) == null) { "Current wardrobe index has duplicate item IDs." }
+            require(id.isNotBlank() && record.optString("sha256").matches(Regex("[0-9a-fA-F]{64}"))) {
+                "Current wardrobe index requires completed media metadata migration before restore."
+            }
+            require(byId.put(id, record) == null) { "Current wardrobe index has duplicate item IDs." }
         }
 
         val next = JSONArray(currentIndexJson)
@@ -61,6 +64,11 @@ object AvaWardrobeMediaRestoreTransaction {
             if (existing != null) {
                 require(existing.optString("sha256").equals(entry.sha256, ignoreCase = true)) {
                     "An item ID already exists with different image content."
+                }
+                val existingFile = File(existing.optString("file", "")).canonicalFile
+                require(AvaWardrobeMediaPolicy.isSafeImageFile(canonicalRoot, existingFile) &&
+                    sha256(existingFile) == entry.sha256) {
+                    "An indexed image failed path or digest verification."
                 }
                 unchanged++
             } else {
