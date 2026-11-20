@@ -318,6 +318,8 @@ Implemented on `ava/mobile-app-integration`:
 - Added `AvaWardrobeMediaRestoreTransaction` and JVM tests.
 - Restore is additive only. It never overwrites or deletes a current indexed image.
 - Same item ID + same SHA-256 is treated as unchanged only after the existing path is verified as a safe private wardrobe file and its bytes are re-hashed.
+- Item IDs are compared case-insensitively; each staged entry is rechecked for UUIDv4 identity, generated filename, private staging location, category, byte limit, MIME/signature agreement, digest and bundle aggregate size before promotion.
+- The copy/promote/index operation runs off the Android UI thread; the owner confirmation and final status remain in the UI.
 - Same item ID + different digest is a hard conflict. A filename collision outside the current index also stops the complete operation.
 - Existing index records must have completed migration metadata (stable item ID and SHA-256); malformed or incomplete indexes fail closed.
 - All incoming files are copied to a new transaction staging directory, synced, and re-hashed before a recovery journal is written.
