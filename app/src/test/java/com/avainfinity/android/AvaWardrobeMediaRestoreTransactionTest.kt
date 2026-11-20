@@ -29,7 +29,7 @@ class AvaWardrobeMediaRestoreTransactionTest {
         val bytes = byteArrayOf(0x89.toByte(), 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 1, 2, 3)
         val fileName = "wardrobe_$id.png"
         val staged = File(stage, fileName).apply { writeBytes(bytes) }
-        val digest = MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") { "%02x".format(it) }
+        val digest = MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") { "%02x".format(it.toInt() and 0xff) }
         val entry = AvaWardrobeMediaBundleCodec.PreviewEntry(
             id, "Imported look", "private", "image/png", bytes.size.toLong(), digest, 123L, fileName, staged
         )
@@ -43,7 +43,12 @@ class AvaWardrobeMediaRestoreTransactionTest {
     @Test fun additiveRestoreCommitsIndexAndPreservesExistingRecords() {
         val f = fixture()
         try {
-            val original = JSONArray().put(JSONObject().put("itemId", UUID.randomUUID().toString()).put("name", "Existing")).toString()
+            val original = JSONArray().put(
+                JSONObject()
+                    .put("itemId", UUID.randomUUID().toString())
+                    .put("sha256", "a".repeat(64))
+                    .put("name", "Existing")
+            ).toString()
             var index = original
             val result = AvaWardrobeMediaRestoreTransaction.apply(
                 f.root, f.journal, f.preview, original,
