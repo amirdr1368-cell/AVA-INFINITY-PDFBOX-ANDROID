@@ -118,3 +118,30 @@ These limits are design defaults and must be reconciled with Android storage and
 ## 11. Implementation gate
 
 This document records a design only. Implementation should begin only after the archive format, limits, streaming strategy, conflict behavior and rollback protocol are reviewed against the current backup worker and restore UI. The feature must be completed and tested before any final APK build or GitHub Actions run.
+
+## 12. Source-code integration findings (reviewed 2026-11-20)
+
+The current implementation was reviewed before any media feature code was written:
+
+- `wardrobePage()` blocks the complete wardrobe screen unless there is an active, approved owner session at level 1 and public-only mode is off.
+- `showAddWardrobeImageDialog()` and `saveOwnerWardrobeImage()` independently repeat the same strict owner-session predicate. A media export/import entry point should use a shared helper matching this predicate and re-check authorization immediately before file access and before commit.
+- Do **not** reuse `ownerStorageActionAllowed()` for wardrobe media. Its current behavior rejects an active session and permits the no-active-session state, which is materially different from the wardrobe's strict owner-session requirement.
+- The current encrypted JSON backup is deliberately bounded at 50 MiB maximum envelope and 35 MiB plaintext. Its implementation materializes JSON and ciphertext byte arrays and Base64-encodes the ciphertext. The media bundle must remain separate and streaming; do not increase these existing limits to accommodate photos.
+- The backup worker captures `backupPayload()`, validates it, writes an encrypted archive to a temporary document, authenticates it by reading it back, reconstructs the chain and compares the resulting payload digest before promoting the archive. Media export should adopt the same temporary-write/read-back/promote discipline, but with streaming and media-specific integrity checks.
+- The existing wardrobe image index stores display name, category, category label, canonical absolute file path and added timestamp. It does not currently store a stable item ID, MIME type, byte length or digest. The absolute path must never leave the device. For backward compatibility, the exporter may derive a portable stable item ID from the generated `wardrobe_<UUID>.<ext>` basename after validating the canonical path, while the next index schema should add explicit item ID and validated metadata.
+- Import currently infers the destination extension from the provider MIME type and defaults unknown MIME types to `.jpg`; it enforces a 15 MiB streaming size cap but does not verify the actual image signature before indexing. The media exporter must inspect actual content and reject mismatched/unsupported formats. A separate hardening task should make future imports verify the image format before committing the index.
+- The wardrobe UI decodes bounded thumbnails (maximum 1200 px on the longest edge), but this is not a substitute for validating full image dimensions and format during export/restore.
+- The current restore flow has a pre-change milestone and rollback for JSON/profile/settings/AACS state. It does not manage wardrobe image files. Media restore must remain a separate transaction with its own staging, swap and rollback; it must not be inserted into the existing JSON restore mutation sequence.
+
+## 13. Updated implementation order
+
+1. Extract and test one shared strict owner-session authorization helper for wardrobe media operations, without changing the behavior of existing backup/export controls.
+2. Define a versioned index migration that adds stable item IDs and verified media metadata while preserving old entries and their files.
+3. Harden image import to validate actual file signatures and bounded dimensions before the index commit.
+4. Implement streaming bundle encode/decode and integrity verification in an isolated media component.
+5. Implement export with temporary destination, read-back authentication and atomic promotion.
+6. Implement preview, conflict handling and staged restore with rollback independent of the JSON restore path.
+7. Add failure-injection tests and device memory/storage tests.
+8. Only after all static review and tests pass, consider the single final APK build and workflow run.
+
+No source-code implementation was changed as part of this review.
