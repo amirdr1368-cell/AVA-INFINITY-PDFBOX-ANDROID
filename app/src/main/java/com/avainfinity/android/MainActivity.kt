@@ -1645,6 +1645,7 @@ class MainActivity : Activity() {
             val temporary = java.io.File(directory, "wardrobe_$fileId.pending")
             pendingImageFile = temporary
             var total = 0L
+            val imageDigest = java.security.MessageDigest.getInstance("SHA-256")
             contentResolver.openInputStream(uri)?.use { input ->
                 java.io.FileOutputStream(temporary).use { output ->
                     val buffer = ByteArray(8192)
@@ -1653,6 +1654,7 @@ class MainActivity : Activity() {
                         if (count < 0) break
                         total += count
                         if (total > 15L * 1024L * 1024L) error("Image exceeds 15 MB")
+                        imageDigest.update(buffer, 0, count)
                         output.write(buffer, 0, count)
                     }
                     output.fd.sync()
@@ -1684,8 +1686,18 @@ class MainActivity : Activity() {
                 "hairstyle" -> "مدل مو"
                 else -> "سایر"
             }
-            saved.put(org.json.JSONObject().put("name", name).put("category", category)
-                .put("categoryLabel", categoryLabel).put("file", destination.canonicalPath)
+            val digestHex = imageDigest.digest().joinToString("") { byte ->
+                "%02x".format(Locale.ROOT, byte.toInt() and 0xff)
+            }
+            saved.put(org.json.JSONObject()
+                .put("itemId", fileId)
+                .put("name", name)
+                .put("category", category)
+                .put("categoryLabel", categoryLabel)
+                .put("mimeType", format.mimeType)
+                .put("byteLength", total)
+                .put("sha256", digestHex)
+                .put("file", destination.canonicalPath)
                 .put("addedAt", System.currentTimeMillis()))
             if (!prefs.edit().putString("owner_wardrobe_images", saved.toString()).commit()) error("Unable to save image index")
             if (!aacs.recordOwnerEvent("WARDROBE_IMAGE_SAVED", "category=$category;bytes=$total")) {
