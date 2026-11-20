@@ -196,3 +196,22 @@ This is a backward-compatible additive write for new records; no automatic rewri
 Commit: `114b7683f431f4a2b5c5f716ced8f582f016f126`.
 
 Tests and build remain unexecuted.
+
+
+## 16. Private file-path validation hardening (2026-11-20)
+
+Implemented:
+- Added `AvaWardrobeMediaPolicy.isSafeImageFile(root, candidate)`.
+- It canonicalizes both paths, requires the image to be a regular file directly inside the canonical private wardrobe directory, accepts only the app-generated UUID filename pattern and supported image extensions, and enforces the existing 15 MiB per-image storage limit.
+- The wardrobe gallery now uses this shared validator before previewing an indexed file. Canonicalization failures and unsafe/missing paths are skipped without modifying the index or deleting files.
+- Added JVM tests for valid generated files, arbitrary names, paths outside the private directory, sibling-prefix directory traversal, missing files and oversized files.
+
+Commits:
+- `630ea780690550d434d96e0ed884d5c5707741f6` gallery uses shared path validation
+- `c965e95b53e7789b4ae5adade22415cb1996a806` canonical path policy
+- `9c8c1f15bff7a284ab7a2a91355bae08a9805054` path policy tests
+
+Compatibility note:
+- Existing legacy index records are not rewritten or deleted. The current gallery remains able to display legacy entries when their stored path resolves to an app-generated, bounded file in the private wardrobe directory.
+- A full metadata migration for legacy entries is still pending. It must be all-or-nothing or staged, preserve every original record, and never infer trusted metadata from an unvalidated file.
+- No tests have been executed and no build/workflow has been run.
