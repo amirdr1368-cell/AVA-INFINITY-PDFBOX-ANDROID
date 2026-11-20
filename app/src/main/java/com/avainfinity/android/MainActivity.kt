@@ -54,7 +54,7 @@ class MainActivity : Activity() {
     private var pendingWardrobePhotoName: String? = null
     private var pendingWardrobePhotoCategory: String? = null
     private var pendingWardrobeMediaExportPassphrase: CharArray? = null
-    private var accent = AvaGlassTheme.Lavender500
+    private var accent = AvaGlassTheme.NexusIce
     private var deep = AvaGlassTheme.Night900
     private var lightTheme = false
     private val primaryTextColor: Int get() = if (lightTheme) AvaGlassTheme.LightPrimaryText else AvaGlassTheme.DarkPrimaryText
@@ -275,13 +275,13 @@ class MainActivity : Activity() {
             setPadding(0, dp(8), 0, dp(14))
         }
         val brand = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
-        brand.addView(text("AVA  ∞", 23f, accent, true))
-        pageTitleView = label("خانه", 10f)
+        brand.addView(text("AVA  ∞", 29f, accent, true))
+        pageTitleView = label("خانه", 12f)
         brand.addView(pageTitleView)
         top.addView(brand, LinearLayout.LayoutParams(0, -2, 1f))
 
         avatar = ImageView(this).apply {
-            layoutParams = LinearLayout.LayoutParams(dp(48), dp(48))
+            layoutParams = LinearLayout.LayoutParams(dp(56), dp(56))
             background = rounded(Color.rgb(91, 65, 99), 60, Color.rgb(224, 181, 218))
             clipToOutline = true
             scaleType = ImageView.ScaleType.CENTER_CROP
@@ -324,7 +324,7 @@ class MainActivity : Activity() {
             val selected = if (key == "ava") {
                 page in setOf("ava", "profile", "voice", "secret", "daily", "console", "security", "wardrobe")
             } else page == key
-            val item = text(title, 11f, if (selected) { if (lightTheme) AvaGlassTheme.LightPrimaryText else AvaGlassTheme.Lavender300 } else secondaryTextColor, true).apply {
+            val item = text(title, 13f, if (selected) { if (lightTheme) AvaGlassTheme.LightPrimaryText else AvaGlassTheme.Lavender300 } else secondaryTextColor, true).apply {
                 gravity = Gravity.CENTER
                 minimumHeight = dp(48)
                 isSelected = selected
@@ -339,7 +339,7 @@ class MainActivity : Activity() {
                 setPadding(dp(2), dp(4), dp(2), dp(4))
                 setOnClickListener { showPage(key) }
             }
-            nav.addView(item, LinearLayout.LayoutParams(0, dp(52), 1f))
+            nav.addView(item, LinearLayout.LayoutParams(0, dp(60), 1f))
         }
         return nav
     }
@@ -4820,13 +4820,11 @@ class MainActivity : Activity() {
     }
 
     private fun applyPaletteValues(which: Int) {
-        lightTheme = which == 3
-        when (which) {
-            1 -> { deep = Color.rgb(38, 22, 29); accent = AvaGlassTheme.RoseGold300 }
-            2 -> { deep = AvaGlassTheme.Night950; accent = AvaGlassTheme.Lavender300 }
-            3 -> { deep = Color.rgb(244, 232, 247); accent = Color.rgb(120, 75, 130) }
-            else -> { deep = AvaGlassTheme.Night900; accent = AvaGlassTheme.Lavender500 }
-        }
+        // AVA INFINITY app identity: Obsidian x Nexus.
+        // Ava's lilac, pink and rose-gold identity remains reserved for her character visuals.
+        lightTheme = false
+        deep = AvaGlassTheme.Night950
+        accent = AvaGlassTheme.NexusIce
     }
 
     private fun applyPalette(which: Int) {
