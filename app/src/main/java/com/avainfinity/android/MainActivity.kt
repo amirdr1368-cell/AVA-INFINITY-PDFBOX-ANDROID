@@ -423,11 +423,21 @@ class MainActivity : Activity() {
         }
         val hero = card().apply { gravity = Gravity.CENTER; setPadding(dp(20), dp(22), dp(20), dp(22)) }
         avatarLarge = ImageView(this).apply {
-            layoutParams = LinearLayout.LayoutParams(dp(avatarSize), dp(avatarSize))
+            // Home hero uses a portrait canvas and FIT_CENTER so the full-body Ava image
+            // remains visible instead of being cropped into a circular avatar.
+            layoutParams = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                dp(430)
+            ).apply {
+                leftMargin = dp(8)
+                rightMargin = dp(8)
+            }
             visibility = if (avatarVisible && !aacs.isPublicOnlyModeActive()) View.VISIBLE else View.GONE
-            background = rounded(Color.rgb(92, 65, 105), 90, Color.rgb(229, 190, 222))
-            clipToOutline = true
-            scaleType = ImageView.ScaleType.CENTER_CROP
+            background = rounded(Color.rgb(15, 20, 30), 26, Color.rgb(75, 112, 140))
+            clipToOutline = false
+            adjustViewBounds = true
+            scaleType = ImageView.ScaleType.FIT_CENTER
+            contentDescription = "تصویر تمام‌قد آوا"
         }
         hero.addView(avatarLarge)
         val greetingName = when {
