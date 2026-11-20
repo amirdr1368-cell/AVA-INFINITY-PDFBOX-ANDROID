@@ -323,7 +323,10 @@ Implemented on `ava/mobile-app-integration`:
 - Same item ID + different digest is a hard conflict. A filename collision outside the current index also stops the complete operation.
 - Existing index records must have completed migration metadata (stable item ID and SHA-256); malformed or incomplete indexes fail closed.
 - All incoming files are copied to a new transaction staging directory, synced, and re-hashed before a recovery journal is written.
-- The journal records old/new index digests and only transaction-generated filenames. It does not store display names, image content, passphrases, or device paths.
+- The journal records old/new index digests and transaction-generated filenames paired with each expected SHA-256. It does not store display names, image content, passphrases, or device paths.
+- Recovery verifies each promoted file against its expected digest and the corresponding index record before accepting a committed transaction. During rollback, it deletes only files whose digest matches the transaction record; unexpected files are preserved and recovery fails closed.
+- The encrypted index is checked before journaling and again immediately before commit to avoid overwriting a newer concurrent wardrobe change.
+- Staging cleanup and the recovery-completion audit must succeed before the journal is removed. If audit or cleanup fails, the journal remains available for retry.
 - Staged files are promoted using generated names that cannot collide with an indexed file. Only after promotion does the code commit the encrypted SharedPreferences index and read it back exactly.
 - If the old index is still active after a failure, only files promoted by this transaction are removed. If the new index was committed but a later step failed, the journal and promoted files are retained for recovery.
 - Owner authorization and required audit callbacks are checked before preparation, while staging/promoting, before index commit, and after commit.
@@ -335,6 +338,8 @@ Tests added:
 - additive restore preserves old records and commits new media;
 - failed index write rolls back only newly promoted media;
 - same ID with different digest is rejected without changing current files;
+- stale index changes abort before journal creation or live promotion;
+- recovery refuses to delete a file whose digest does not match the transaction journal;
 - a committed index with an incomplete final audit leaves a journal that recovery can safely finalize.
 
 Verification boundary:
