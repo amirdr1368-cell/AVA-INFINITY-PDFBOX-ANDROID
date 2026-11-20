@@ -263,3 +263,29 @@ The current backup implementation was re-read before beginning media bundle work
 
 No media encryption, export, import, restore, or user-interface controls were added during this review. No Gradle tests, build, or Actions run were started.
 
+
+
+## 20. Streaming encrypted media bundle codec (2026-11-20)
+
+Implemented on `ava/mobile-app-integration` as an isolated codec only:
+- Added binary companion format `AVA-WARDROBE-MEDIA-1`, separate from the existing JSON backup chain.
+- Uses AES-256-GCM with PBKDF2-HMAC-SHA256 (210,000 iterations), a fresh 16-byte salt, fresh 12-byte nonce, and the complete fixed header as authenticated additional data.
+- Streams image bytes through the cipher. The manifest contains generated filenames and metadata only; device-local absolute paths and provider URIs are never serialized.
+- Enforces 200 items, 15 MiB per image, 100 MiB aggregate uncompressed image data, 1 MiB manifest, and a bounded encrypted input size.
+- Validates UUIDv4 IDs, category keys, generated filenames, image signatures, filename-extension/MIME consistency, lengths, SHA-256 digests, duplicate IDs/names, and aggregate sizes.
+- Decryption writes only to a newly created private staging directory. The GCM tag must authenticate before a staged preview is returned. Any failure removes the newly created staging directory.
+- The decoder requires a caller-supplied platform image-validation callback, so the future Android integration must perform bounded BitmapFactory decode/dimension checks before a preview can be considered ready.
+- The codec never changes the live wardrobe index or files. Applying a restore remains a separate, not-yet-implemented transaction requiring owner confirmation and rollback.
+
+Commits:
+- `8670009d87b4130cd422deaf5797946db945ec6c` streaming AES-GCM codec
+- `696ba98c1dd4d4450ec902a11ee1edfed497af42` initial codec tests
+- `cbc99ad3181c79d6bd6653b49c7895c8d4e8c21d` key cleanup and mandatory platform validation callback
+- `0bea2f50a3f4618dad84d94b8128bef4f2cd03fc` explicit test callback updates
+
+Verification status:
+- Codec and tests were fetched back from GitHub and inspected.
+- Five JVM tests are present for multi-format round trip, wrong passphrase, authentication-tag tampering, truncation, unsafe export path and duplicate IDs.
+- Tests have not been executed. No Gradle task, APK build or GitHub Actions workflow has been run.
+- No UI export/restore flow is wired to this codec yet.
+
