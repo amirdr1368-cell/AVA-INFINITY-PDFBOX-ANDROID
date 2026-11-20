@@ -40,6 +40,7 @@ object AvaGlassComponents {
         textSize = sizeSp * fontScale
         setTextColor(if (color == Color.WHITE) primaryTextColor else color)
         if (bold) setTypeface(typeface, Typeface.BOLD)
+        setLineSpacing(dp(context, 2).toFloat(), 1.03f)
         gravity = Gravity.CENTER_VERTICAL
     }
 
@@ -60,7 +61,7 @@ object AvaGlassComponents {
             context, value, 15f, Color.WHITE, true, fontScale, primaryTextColor
         ).apply {
             gravity = Gravity.CENTER
-            minimumHeight = dp(context, 48)
+            minimumHeight = dp(context, 52)
             isFocusable = true
             contentDescription = value
             setPadding(dp(context, 16), dp(context, 12), dp(context, 16), dp(context, 12))
