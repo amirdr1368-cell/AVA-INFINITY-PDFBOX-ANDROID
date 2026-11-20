@@ -1765,8 +1765,10 @@ class MainActivity : Activity() {
                             .setMessage("فقط تصاویر جدید اضافه می‌شوند. تصاویر فعلی دست‌نخورده می‌مانند. شناسه‌های دارای محتوای متفاوت باعث توقف کامل عملیات می‌شوند. ادامه می‌دهی؟")
                             .setNegativeButton("انصراف", null)
                             .setPositiveButton("تأیید و اجرا") { _, _ ->
-                                applyWardrobeMediaRestore(previewToApply)
-                                previewDialog.dismiss()
+                                previewDialog.getButton(AlertDialog.BUTTON_POSITIVE)?.isEnabled = false
+                                applyWardrobeMediaRestore(previewToApply) {
+                                    previewDialog.dismiss()
+                                }
                             }
                             .show()
                     }
@@ -1783,41 +1785,49 @@ class MainActivity : Activity() {
         }
     }
 
-    private fun applyWardrobeMediaRestore(preview: AvaWardrobeMediaBundleCodec.StagedPreview) {
+    private fun applyWardrobeMediaRestore(
+        preview: AvaWardrobeMediaBundleCodec.StagedPreview,
+        onFinished: () -> Unit
+    ) {
         if (!isCurrentOwnerMediaSession()) {
             Toast.makeText(this, "نشست مالک معتبر نیست؛ هیچ تغییری انجام نشد.", Toast.LENGTH_LONG).show()
+            onFinished()
             return
         }
-        try {
-            val original = prefs.getString("owner_wardrobe_images", "[]") ?: "[]"
-            val result = AvaWardrobeMediaRestoreTransaction.apply(
-                root = java.io.File(filesDir, "ava-wardrobe"),
-                journalDirectory = filesDir,
-                preview = preview,
-                currentIndexJson = original,
-                readIndex = { prefs.getString("owner_wardrobe_images", "[]") ?: "[]" },
-                writeIndex = { value ->
-                    isCurrentOwnerMediaSession() &&
-                        prefs.edit().putString("owner_wardrobe_images", value).commit()
-                },
-                isOwnerAuthorized = ::isCurrentOwnerMediaSession,
-                audit = { event, details ->
-                    isCurrentOwnerMediaSession() && aacs.recordOwnerEvent(event, details)
-                }
-            )
-            Toast.makeText(
-                this,
-                "ادغام انجام شد: ${result.added} تصویر جدید، ${result.unchanged} تصویر تکراری بدون تغییر.",
-                Toast.LENGTH_LONG
-            ).show()
-            showPage("wardrobe")
-        } catch (_: Exception) {
-            Toast.makeText(
-                this,
-                "بازیابی کامل نشد؛ تصاویر قبلی حفظ شدند. اگر تراکنش نیمه‌تمام مانده باشد، در ورود بعدی بررسی می‌شود.",
-                Toast.LENGTH_LONG
-            ).show()
-        }
+        Thread({
+            var successMessage: String? = null
+            var failureMessage: String? = null
+            try {
+                val original = prefs.getString("owner_wardrobe_images", "[]") ?: "[]"
+                val result = AvaWardrobeMediaRestoreTransaction.apply(
+                    root = java.io.File(filesDir, "ava-wardrobe"),
+                    journalDirectory = filesDir,
+                    preview = preview,
+                    currentIndexJson = original,
+                    readIndex = { prefs.getString("owner_wardrobe_images", "[]") ?: "[]" },
+                    writeIndex = { value ->
+                        isCurrentOwnerMediaSession() &&
+                            prefs.edit().putString("owner_wardrobe_images", value).commit()
+                    },
+                    isOwnerAuthorized = ::isCurrentOwnerMediaSession,
+                    audit = { event, details ->
+                        isCurrentOwnerMediaSession() && aacs.recordOwnerEvent(event, details)
+                    }
+                )
+                successMessage = "ادغام انجام شد: ${result.added} تصویر جدید، ${result.unchanged} تصویر تکراری بدون تغییر."
+            } catch (_: Exception) {
+                failureMessage = "بازیابی کامل نشد؛ تصاویر قبلی حفظ شدند. اگر تراکنش نیمه‌تمام مانده باشد، در ورود بعدی بررسی می‌شود."
+            }
+            runOnUiThread {
+                Toast.makeText(
+                    this,
+                    successMessage ?: failureMessage ?: "وضعیت بازیابی مشخص نشد.",
+                    Toast.LENGTH_LONG
+                ).show()
+                if (successMessage != null) showPage("wardrobe")
+                onFinished()
+            }
+        }, "ava-wardrobe-media-restore").start()
     }
 
     /**
