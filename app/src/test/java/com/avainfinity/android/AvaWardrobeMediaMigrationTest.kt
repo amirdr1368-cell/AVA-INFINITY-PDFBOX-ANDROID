@@ -82,6 +82,19 @@ class AvaWardrobeMediaMigrationTest {
         }
     }
 
+    @Test fun leavesAlreadyEnrichedIndexByteForByteUnchanged() {
+        val base = Files.createTempDirectory("ava-wardrobe-current").toFile()
+        try {
+            val raw = """[ { "itemId":"existing", "mimeType":"image/png", "byteLength":10, "sha256":"${"a".repeat(64)}", "file":"not-opened" } ]"""
+            val outcome = AvaWardrobeMediaMigration.migrateLegacyIndex(raw, File(base, "ava-wardrobe"))
+            assertFalse(outcome.changed)
+            assertEquals(0, outcome.migratedRecords)
+            assertEquals(raw, outcome.json)
+        } finally {
+            base.deleteRecursively()
+        }
+    }
+
     @Test fun rejectsImageSignatureThatDoesNotMatchFilenameExtension() {
         val base = Files.createTempDirectory("ava-wardrobe-extension").toFile()
         try {
