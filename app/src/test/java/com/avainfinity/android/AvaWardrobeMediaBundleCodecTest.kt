@@ -137,6 +137,34 @@ class AvaWardrobeMediaBundleCodecTest {
         }
     }
 
+    @Test fun platformImageValidationFailureRemovesStaging() {
+        val base = Files.createTempDirectory("ava-media-platform-validation").toFile()
+        try {
+            val root = File(base, "ava-wardrobe").apply { mkdirs() }
+            val id = UUID.randomUUID().toString()
+            val image = File(root, "wardrobe_$id.png").apply {
+                writeBytes(byteArrayOf(0x89.toByte(), 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A))
+            }
+            val output = ByteArrayOutputStream()
+            AvaWardrobeMediaBundleCodec.exportEncrypted(
+                output, root, listOf(AvaWardrobeMediaBundleCodec.ExportEntry(id, "test", "other", 1L, image)),
+                passphrase.copyOf()
+            )
+            val stagingParent = File(base, "staging").apply { mkdirs() }
+            var failed = false
+            try {
+                AvaWardrobeMediaBundleCodec.decryptToStaging(
+                    ByteArrayInputStream(output.toByteArray()), stagingParent, passphrase.copyOf(),
+                    validateStagedImage = { false }
+                )
+            } catch (_: Exception) { failed = true }
+            assertTrue(failed)
+            assertEquals(0, stagingParent.listFiles()?.size ?: 0)
+        } finally {
+            base.deleteRecursively()
+        }
+    }
+
     @Test fun rejectsUnsafeExportPathAndDuplicateIds() {
         val base = Files.createTempDirectory("ava-media-reject").toFile()
         try {
