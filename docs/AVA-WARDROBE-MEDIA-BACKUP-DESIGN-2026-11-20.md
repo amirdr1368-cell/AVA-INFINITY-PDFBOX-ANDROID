@@ -1,6 +1,6 @@
 # AVA INFINITY - Wardrobe Media Backup Design
 
-Status: DESIGN PROPOSAL ONLY  
+Status: IMPLEMENTATION IN PROGRESS  
 Date: 2026-11-20  
 Target branch: `ava/mobile-app-integration`  
 Implementation status: NOT IMPLEMENTED; no build or workflow run is authorized by this document.
@@ -276,7 +276,7 @@ Implemented on `ava/mobile-app-integration` as an isolated codec only:
 - Decryption writes only to a newly created private staging directory. A dedicated streaming input wrapper calls `Cipher.doFinal()` explicitly and propagates GCM authentication failures before a staged preview is returned. Any failure removes the newly created staging directory.
 - The decoder requires a caller-supplied platform image-validation callback. `AvaWardrobeAndroidImageValidator` now checks BitmapFactory bounds (maximum 12,000 px edge and 40 million pixels) and performs a sampled decode capped around a 1,200 px edge. The same validator is used when saving new owner images.
 - The callback is mandatory rather than defaulted to permissive behavior; a caller that cannot validate staged image dimensions must fail closed.
-- The codec never changes the live wardrobe index or files. Applying a restore remains a separate, not-yet-implemented transaction requiring owner confirmation and rollback.
+- The codec never changes the live wardrobe index or files. Applying a restore is implemented as a separate additive transaction; UI wiring and runtime verification are tracked below.
 
 Commits:
 - `8670009d87b4130cd422deaf5797946db945ec6c` streaming AES-GCM codec
@@ -310,3 +310,31 @@ Important current boundary:
 - This UI does **not** apply restored images, change the live wardrobe index, replace existing files, or delete existing files.
 - The next implementation stage must add a separate owner-confirmed staging/apply transaction with a pre-change media snapshot, index validation, safe promotion, read-back verification, rollback and crash recovery.
 - Export and import actions have not been compiled or exercised on a device. No tests, Gradle build, APK build or Actions run has been performed.
+
+
+## 21. Additive owner-confirmed restore transaction (2026-11-20)
+
+Implemented on `ava/mobile-app-integration`:
+- Added `AvaWardrobeMediaRestoreTransaction` and JVM tests.
+- Restore is additive only. It never overwrites or deletes a current indexed image.
+- Same item ID + same SHA-256 is treated as unchanged only after the existing path is verified as a safe private wardrobe file and its bytes are re-hashed.
+- Same item ID + different digest is a hard conflict. A filename collision outside the current index also stops the complete operation.
+- Existing index records must have completed migration metadata (stable item ID and SHA-256); malformed or incomplete indexes fail closed.
+- All incoming files are copied to a new transaction staging directory, synced, and re-hashed before a recovery journal is written.
+- The journal records old/new index digests and only transaction-generated filenames. It does not store display names, image content, passphrases, or device paths.
+- Staged files are promoted using generated names that cannot collide with an indexed file. Only after promotion does the code commit the encrypted SharedPreferences index and read it back exactly.
+- If the old index is still active after a failure, only files promoted by this transaction are removed. If the new index was committed but a later step failed, the journal and promoted files are retained for recovery.
+- Owner authorization and required audit callbacks are checked before preparation, while staging/promoting, before index commit, and after commit.
+- Recovery is owner-gated. It compares the current encrypted index digest with the journal's old/new digest: old means remove only transaction-owned files; new means verify every promoted file is present and indexed, then clean temporary state. An unknown digest or audit failure preserves the journal and fails closed.
+- Since the algorithm is strictly additive and does not mutate existing media, a pre-change media bundle is not required for this merge mode. A future replace/overwrite mode would require a separate explicit choice and a verified pre-change backup; it is not part of this implementation.
+- The owner preview dialog now offers a second explicit confirmation before additive application. The wardrobe page invokes journal recovery before legacy metadata migration.
+
+Tests added:
+- additive restore preserves old records and commits new media;
+- failed index write rolls back only newly promoted media;
+- same ID with different digest is rejected without changing current files;
+- a committed index with an incomplete final audit leaves a journal that recovery can safely finalize.
+
+Verification boundary:
+- Source, UI integration, tests and documentation have been written to the branch and are awaiting static read-back review.
+- No Gradle tests, compilation, APK build, device test or GitHub Actions run has been performed. One final workflow run remains reserved until all implementation and static review work is complete.
