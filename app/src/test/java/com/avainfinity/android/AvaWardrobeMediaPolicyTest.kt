@@ -23,8 +23,6 @@ class AvaWardrobeMediaPolicyTest {
         assertFalse(AvaWardrobeMediaPolicy.canAccessOwnerMedia(false, true, true, 1, "person-amir"))
         assertFalse(AvaWardrobeMediaPolicy.canAccessOwnerMedia(false, true, true, 4, "guest-123"))
     }
-}
-
 
     @Test fun acceptsOnlyGeneratedBoundedFilesInsideCanonicalWardrobeDirectory() {
         val base = java.nio.file.Files.createTempDirectory("ava-wardrobe-test").toFile()
@@ -63,3 +61,4 @@ class AvaWardrobeMediaPolicyTest {
             base.deleteRecursively()
         }
     }
+}
