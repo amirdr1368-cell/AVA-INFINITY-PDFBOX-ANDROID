@@ -28,3 +28,11 @@
 
 ## Change-control
 Implement only on `ava/mobile-app-integration`. Keep `master` untouched and PR #1 in Draft. Do not start the final build until image assets, full regression review, and privacy-gate verification are complete.
+
+
+## Hairstyle catalog
+- Added `app/src/main/assets/ava-hairstyle-catalog.json` with six hairstyle references.
+- Amir's selected base style: **Messy High Bun / دم‌اسبی گوجه‌ای**.
+- Ava's style suggestions: Glossy High Ponytail, Half-Up Soft Waves, Low Messy Bun, Side Braid & Waves, and Claw-Clip French Twist.
+- The owner wardrobe page now reads and lists the hairstyle catalog.
+- The image URLs are external inspiration references only. They are not local image assets and are not embedded in the APK.
