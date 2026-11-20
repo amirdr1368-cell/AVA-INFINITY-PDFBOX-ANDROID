@@ -201,12 +201,22 @@ object AvaWardrobeMediaRestoreTransaction {
             val stage = File(journalDirectory.canonicalFile, stageName)
             val files = journal.getJSONArray("promotedFiles")
             if (currentDigest == nextDigest) {
-                // New index is live. Keep all promoted media.
+                // New index is live. Confirm every transaction-owned file is present and indexed.
+                val currentArray = JSONArray(current)
+                val indexedPaths = (0 until currentArray.length()).mapNotNull { currentArray.optJSONObject(it)?.optString("file") }.toSet()
+                for (i in 0 until files.length()) {
+                    val name = files.getString(i)
+                    require(name.matches(Regex("wardrobe_[0-9a-fA-F-]{36}\\.(jpg|png|gif|webp)")))
+                    val promoted = File(root.canonicalFile, name).canonicalFile
+                    require(promoted.parentFile == root.canonicalFile && promoted.isFile && promoted.absolutePath in indexedPaths)
+                }
             } else if (currentDigest == oldDigest) {
                 for (i in 0 until files.length()) {
                     val name = files.getString(i)
                     require(name.matches(Regex("wardrobe_[0-9a-fA-F-]{36}\\.(jpg|png|gif|webp)")))
-                    File(root.canonicalFile, name).delete()
+                    val rollbackFile = File(root.canonicalFile, name).canonicalFile
+                    require(rollbackFile.parentFile == root.canonicalFile)
+                    rollbackFile.delete()
                 }
             } else {
                 return false
