@@ -276,7 +276,7 @@ class MainActivity : Activity() {
         }
         val brand = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
         brand.addView(text("AVA  ∞", 29f, accent, true))
-        pageTitleView = label("خانه", 12f)
+        pageTitleView = label("خانه", 13f)
         brand.addView(pageTitleView)
         top.addView(brand, LinearLayout.LayoutParams(0, -2, 1f))
 
@@ -325,7 +325,7 @@ class MainActivity : Activity() {
             val selected = if (key == "ava") {
                 page in setOf("ava", "profile", "voice", "secret", "daily", "console", "security", "wardrobe")
             } else page == key
-            val item = text(title, 13f, if (selected) { if (lightTheme) AvaGlassTheme.LightPrimaryText else AvaGlassTheme.NexusIce } else secondaryTextColor, true).apply {
+            val item = text(title, 15f, if (selected) { if (lightTheme) AvaGlassTheme.LightPrimaryText else AvaGlassTheme.NexusIce } else secondaryTextColor, true).apply {
                 gravity = Gravity.CENTER
                 minimumHeight = dp(48)
                 isSelected = selected
@@ -1301,7 +1301,7 @@ class MainActivity : Activity() {
         val preview = ImageView(this).apply {
             layoutParams = LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
-                dp(250)
+                dp(300)
             ).apply {
                 leftMargin = dp(12)
                 rightMargin = dp(12)
