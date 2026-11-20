@@ -147,6 +147,7 @@ object AvaWardrobeMediaRestoreTransaction {
                 require(stagedCopy.length() == entry.byteLength && sha256(stagedCopy) == entry.sha256)
             }
 
+            require(readIndex() == currentIndexJson) { "Wardrobe index changed during restore preparation." }
             val journal = JSONObject()
                 .put("version", JOURNAL_VERSION)
                 .put("transactionId", transactionId)
