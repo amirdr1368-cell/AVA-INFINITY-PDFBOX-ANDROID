@@ -1667,8 +1667,16 @@ class MainActivity : Activity() {
             } ?: error("Unable to read selected image")
 
             val header = ByteArray(12)
-            val headerBytes = java.io.FileInputStream(temporary).use { it.read(header) }
-            val format = AvaWardrobeImageFormat.detect(header.copyOf(maxOf(0, headerBytes)))
+            val headerBytes = java.io.FileInputStream(temporary).use { input ->
+                var offset = 0
+                while (offset < header.size) {
+                    val count = input.read(header, offset, header.size - offset)
+                    if (count < 0) break
+                    offset += count
+                }
+                offset
+            }
+            val format = AvaWardrobeImageFormat.detect(header.copyOf(headerBytes))
                 ?: error("Unsupported or invalid image signature")
             val bounds = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
             android.graphics.BitmapFactory.decodeFile(temporary.absolutePath, bounds)
