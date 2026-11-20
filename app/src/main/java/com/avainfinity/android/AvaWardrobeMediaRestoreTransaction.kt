@@ -266,6 +266,7 @@ object AvaWardrobeMediaRestoreTransaction {
                 }
             } else if (currentDigest == oldDigest) {
                 for (i in 0 until files.length()) {
+                    require(isOwnerAuthorized()) { "Owner session changed during restore recovery." }
                     val item = files.getJSONObject(i)
                     val name = item.getString("name")
                     val expectedDigest = item.getString("sha256")
