@@ -2,6 +2,9 @@ name: AVA INFINITY Verified Android Build
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - ava/build-verified
 
 permissions:
   contents: read
