@@ -57,7 +57,9 @@ class AvaWardrobeMediaPolicyTest {
         try {
             val root = java.io.File(base, "ava-wardrobe").apply { mkdirs() }
             val oversized = java.io.File(root, "wardrobe_123e4567-e89b-12d3-a456-426614174003.png")
-                .apply { setLength(15L * 1024L * 1024L + 1L) }
+            java.io.RandomAccessFile(oversized, "rw").use {
+                it.setLength(15L * 1024L * 1024L + 1L)
+            }
             assertFalse(AvaWardrobeMediaPolicy.isSafeImageFile(root, oversized))
             val missing = java.io.File(root, "wardrobe_123e4567-e89b-12d3-a456-426614174004.png")
             assertFalse(AvaWardrobeMediaPolicy.isSafeImageFile(root, missing))
