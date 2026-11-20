@@ -132,7 +132,10 @@ object AvaWardrobeMediaRestoreTransaction {
         require(additions.isNotEmpty() || unchanged == preview.entries.size) { "Nothing can be safely applied." }
         // A bundle containing only verified identical items is a true no-op: do not rewrite
         // SharedPreferences, create a recovery journal, or normalize the existing JSON.
-        if (additions.isEmpty()) return Result(0, unchanged, currentIndexJson)
+        if (additions.isEmpty()) {
+            require(readIndex() == currentIndexJson) { "Wardrobe index changed during restore preparation." }
+            return Result(0, unchanged, currentIndexJson)
+        }
 
         val oldDigest = sha256(currentIndexJson)
         val nextJson = next.toString()
