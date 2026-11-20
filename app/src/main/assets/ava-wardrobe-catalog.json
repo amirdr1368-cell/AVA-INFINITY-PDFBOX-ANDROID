@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "project": "AVA INFINITY",
+  "updated": "2026-11-20",
+  "privacy": {
+    "category": "private",
+    "access": "owner_only",
+    "publicUiLabel": "مجموعه خصوصی",
+    "requiresOwnerReauthentication": true
+  },
+  "items": [
+    {
+      "id": 136,
+      "name": "Lilac Moon",
+      "category": "private",
+      "type": "sleepwear",
+      "description": "لباس خواب بلند ساتن یاسی با حاشیه ظریف",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 137,
+      "name": "Burgundy Lace",
+      "category": "private",
+      "type": "bodysuit",
+      "description": "بادی زرشکی با جزئیات توری",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 138,
+      "name": "Champagne Robe",
+      "category": "private",
+      "type": "robe",
+      "description": "کیمونوی ساتن شامپاینی",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 139,
+      "name": "Plum Whisper",
+      "category": "private",
+      "type": "loungewear",
+      "description": "ست راحتی ساتن آلویی",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 140,
+      "name": "Royal Lace",
+      "category": "private",
+      "type": "lingerie_set",
+      "description": "ست یاسی با توری ظریف",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    },
+    {
+      "id": 141,
+      "name": "Rose Infinity",
+      "category": "private",
+      "type": "nightdress",
+      "description": "لباس خواب ساتن رزگلد",
+      "approval": "APPROVED_BY_AMIR",
+      "assetStatus": "PENDING"
+    }
+  ]
+}
