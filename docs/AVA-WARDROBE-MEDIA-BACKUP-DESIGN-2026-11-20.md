@@ -135,9 +135,9 @@ The current implementation was reviewed before any media feature code was writte
 
 ## 13. Updated implementation order
 
-1. Extract and test one shared strict owner-session authorization helper for wardrobe media operations, without changing the behavior of existing backup/export controls.
-2. Define a versioned index migration that adds stable item IDs and verified media metadata while preserving old entries and their files.
-3. Harden image import to validate actual file signatures and bounded dimensions before the index commit.
+1. [x] Extract and test one shared strict owner-session authorization helper for wardrobe media operations, without changing the behavior of existing backup/export controls. (Source and tests are present; tests not yet executed.)
+2. [x] Define and integrate a versioned, non-destructive metadata enrichment migration that adds stable item IDs and verified media metadata while preserving old entries and their files. (Source and tests are present; tests not yet executed.)
+3. [x] Harden image import to validate actual file signatures and bounded dimensions before the index commit. (Source and tests are present; tests not yet executed.)
 4. Implement streaming bundle encode/decode and integrity verification in an isolated media component.
 5. Implement export with temporary destination, read-back authentication and atomic promotion.
 6. Implement preview, conflict handling and staged restore with rollback independent of the JSON restore path.
@@ -248,4 +248,18 @@ Verification status:
 - New source, integration, tests, and documentation were fetched back from GitHub and inspected.
 - Gradle tests, compile, APK build, and GitHub Actions have not been run, by design.
 - This migration enriches local metadata only. It does not create a media backup or implement restore.
+
+
+
+## 19. Backup and restore integration review (2026-11-20)
+
+The current backup implementation was re-read before beginning media bundle work:
+- `AvaEncryptedBackup` uses AES-GCM with PBKDF2-HMAC-SHA256, a random salt and nonce, and the existing JSON envelope. It materializes JSON plaintext, ciphertext, and Base64 envelope data in memory, so it is not suitable for image collections.
+- `AvaBackupWorker` writes a temporary encrypted archive, authenticates it by reading it back, verifies archive identity, reconstructs the chain and compares the reconstructed payload digest before promoting to an immutable filename. The media companion must use a separate streaming implementation and must not be inserted into the JSON archive chain.
+- `AvaBackupChainRepository` manages encrypted archive indexes and dependency-aware retention. The media companion should have its own versioned artifact and lifecycle; JSON chain pruning must never delete or invalidate media bundles.
+- The current restore UI in `MainActivity` previews authenticated JSON payloads, obtains owner approval, creates a pre-change milestone, restores data/profile/settings/AACS state, verifies read-back, and attempts rollback on failure. It does not stage or swap wardrobe media.
+- Therefore, media restore must remain an independent transaction with its own staged directory, next-index validation, owner confirmation, rollback state and recovery behavior. Do not add wardrobe image replacement to the existing JSON restore mutation sequence.
+- The current backup worker rejects public-only mode and active sessions. Media export must use the stricter wardrobe owner-session policy and re-check authorization before accessing private image files and before publishing an output.
+
+No media encryption, export, import, restore, or user-interface controls were added during this review. No Gradle tests, build, or Actions run were started.
 
