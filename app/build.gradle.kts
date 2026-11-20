@@ -16,6 +16,15 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    buildTypes {
+        getByName("debug") {
+            // Keep the test build side-by-side with the existing installation.
+            // This avoids replacing user data when the original signing key is unavailable.
+            applicationIdSuffix = ".next"
+            versionNameSuffix = "-next"
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
