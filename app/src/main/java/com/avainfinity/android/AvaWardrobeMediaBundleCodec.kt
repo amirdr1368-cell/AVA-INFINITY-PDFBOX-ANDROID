@@ -164,7 +164,8 @@ object AvaWardrobeMediaBundleCodec {
     fun decryptToStaging(
         source: InputStream,
         stagingParent: File,
-        passphrase: CharArray
+        passphrase: CharArray,
+        validateStagedImage: (File) -> Boolean
     ): StagedPreview {
         var staging: File? = null
         try {
@@ -179,10 +180,9 @@ object AvaWardrobeMediaBundleCodec {
             val salt = header.copyOfRange(12, 12 + SALT_BYTES)
             val nonce = header.copyOfRange(12 + SALT_BYTES, HEADER_BYTES)
             val key = derive(passphrase, salt)
-            staging = File(stagingParent, "ava-media-restore_" + UUID.randomUUID().toString())
-            require(staging.mkdirs()) { "Media restore staging directory could not be created." }
-
             try {
+                staging = File(stagingParent, "ava-media-restore_" + UUID.randomUUID().toString())
+                require(staging.mkdirs()) { "Media restore staging directory could not be created." }
                 val cipher = Cipher.getInstance("AES/GCM/NoPadding")
                 cipher.init(Cipher.DECRYPT_MODE, SecretKeySpec(key, "AES"), GCMParameterSpec(TAG_BITS, nonce))
                 cipher.updateAAD(header)
@@ -255,6 +255,9 @@ object AvaWardrobeMediaBundleCodec {
                         val format = inspect(stagedFile)
                         require(format.mimeType == mime && format.byteLength == size)
                         require(actualDigest.digest().toHex() == digest)
+                        require(validateStagedImage(stagedFile)) {
+                            "Staged image failed platform decoder and dimension validation."
+                        }
                         stagedEntries.add(
                             PreviewEntry(id, name, category, mime, size, digest, addedAt, fileName, stagedFile)
                         )
