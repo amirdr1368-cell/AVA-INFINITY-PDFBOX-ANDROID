@@ -6,6 +6,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.security.MessageDigest
+import java.util.Locale
 import java.util.UUID
 
 /**
@@ -52,12 +53,12 @@ object AvaWardrobeMediaRestoreTransaction {
             require(id.isNotBlank() && record.optString("sha256").matches(Regex("[0-9a-fA-F]{64}"))) {
                 "Current wardrobe index requires completed media metadata migration before restore."
             }
-            require(byId.put(id, record) == null) { "Current wardrobe index has duplicate item IDs." }
+            require(byId.put(id.lowercase(Locale.ROOT), record) == null) { "Current wardrobe index has duplicate item IDs." }
         }
 
         val next = JSONArray(currentIndexJson)
         require(preview.entries.size <= AvaWardrobeMediaBundleCodec.MAX_ITEMS)
-        require(preview.entries.map { it.itemId }.distinct().size == preview.entries.size)
+        require(preview.entries.map { it.itemId.lowercase(Locale.ROOT) }.distinct().size == preview.entries.size)
         require(preview.stagingDirectory.isDirectory)
         require(preview.entries.sumOf { it.byteLength } == preview.totalBytes &&
             preview.totalBytes <= AvaWardrobeMediaBundleCodec.MAX_TOTAL_BYTES)
@@ -84,7 +85,7 @@ object AvaWardrobeMediaRestoreTransaction {
                 require(detected.mimeType == entry.mimeType && entry.fileName.endsWith(detected.extension))
             }
             require(isOwnerAuthorized()) { "Owner session changed during restore preparation." }
-            val existing = byId[entry.itemId]
+            val existing = byId[entry.itemId.lowercase(Locale.ROOT)]
             if (existing != null) {
                 require(existing.optString("sha256").equals(entry.sha256, ignoreCase = true)) {
                     "An item ID already exists with different image content."
