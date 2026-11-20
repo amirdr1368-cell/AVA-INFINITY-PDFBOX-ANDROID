@@ -128,6 +128,34 @@ class AvaWardrobeMediaRestoreTransactionTest {
         } finally { f.base.deleteRecursively() }
     }
 
+    @Test fun recoveryRollsBackOnlyFilesMatchingJournalDigestWhenOldIndexIsLive() {
+        val f = fixture()
+        try {
+            val entry = f.preview.entries.single()
+            val promoted = File(f.root, entry.fileName).apply { writeBytes(entry.stagedFile.readBytes()) }
+            val oldDigest = MessageDigest.getInstance("SHA-256")
+                .digest("[]".toByteArray(Charsets.UTF_8))
+                .joinToString("") { "%02x".format(it.toInt() and 0xff) }
+            val journalFile = File(f.journal, "ava-wardrobe-media-restore-journal.json")
+            JSONObject()
+                .put("version", 1)
+                .put("transactionId", UUID.randomUUID().toString())
+                .put("oldIndexSha256", oldDigest)
+                .put("nextIndexSha256", "d".repeat(64))
+                .put("stageDirectory", "ava-wardrobe-restore-${UUID.randomUUID()}.stage")
+                .put("promotedFiles", JSONArray().put(
+                    JSONObject().put("name", entry.fileName).put("sha256", entry.sha256)
+                ))
+                .also { journalFile.writeText(it.toString()) }
+            assertTrue(AvaWardrobeMediaRestoreTransaction.recover(
+                f.root, f.journal, readIndex = { "[]" },
+                isOwnerAuthorized = { true }, audit = { _, _ -> true }
+            ))
+            assertFalse(promoted.exists())
+            assertFalse(journalFile.exists())
+        } finally { f.base.deleteRecursively() }
+    }
+
     @Test fun recoveryRefusesToDeleteFileWithUnexpectedDigest() {
         val f = fixture()
         try {
@@ -176,6 +204,13 @@ class AvaWardrobeMediaRestoreTransactionTest {
                 )
             } catch (_: Exception) { }
             assertTrue(commitAuditFailed)
+            assertTrue(File(f.journal, "ava-wardrobe-media-restore-journal.json").isFile)
+            val auditBlocked = AvaWardrobeMediaRestoreTransaction.recover(
+                f.root, f.journal, readIndex = { index },
+                isOwnerAuthorized = { true },
+                audit = { event, _ -> event != "WARDROBE_MEDIA_RESTORE_RECOVERY_COMPLETED" }
+            )
+            assertFalse(auditBlocked)
             assertTrue(File(f.journal, "ava-wardrobe-media-restore-journal.json").isFile)
             assertTrue(AvaWardrobeMediaRestoreTransaction.recover(
                 f.root, f.journal, readIndex = { index },
