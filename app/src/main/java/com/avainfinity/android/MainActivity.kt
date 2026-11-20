@@ -1435,6 +1435,11 @@ class MainActivity : Activity() {
             .apply { setMarginsCompat(top = 10) })
         body.addView(label("تصاویر انتخابی تو در حافظه داخلی همین گوشی ذخیره می‌شوند و در همین بخش قابل مشاهده خواهند بود.", 11f)
             .apply { setPadding(dp(2), dp(6), dp(2), 0) })
+        if (!migrateOwnerWardrobeImageIndex()) {
+            body.addView(label("تکمیل اطلاعات تصاویر قدیمی انجام نشد؛ رکوردها و فایل‌های قبلی بدون تغییر باقی ماندند.", 11f, Color.rgb(190, 132, 75))
+                .apply { setPadding(dp(2), dp(6), dp(2), 0) })
+        }
+
         body.addView(label("نکته پشتیبان: تصاویر شخصی فعلاً داخل فایل پشتیبان رمزگذاری‌شده قرار نمی‌گیرند. پیش از حذف برنامه یا پاک‌کردن داده‌های آن، نسخه جداگانه‌ای از عکس‌ها نگه دار.", 11f, Color.rgb(190, 132, 75))
             .apply { setPadding(dp(2), dp(6), dp(2), dp(4)) })
 
@@ -1561,6 +1566,76 @@ class MainActivity : Activity() {
         }
         body.addView(button("بازگشت به مرکز آوا") { showPage("ava") }.apply { setMarginsCompat(top = 12) })
         contentArea.addView(body)
+    }
+
+    /**
+     * Enriches legacy image index entries without replacing or deleting old data.
+     * Runs only from the owner-gated wardrobe page.
+     */
+    private fun migrateOwnerWardrobeImageIndex(): Boolean {
+        return try {
+            val ownerOnly = AvaWardrobeMediaPolicy.canAccessOwnerMedia(
+                aacs.isPublicOnlyModeActive(),
+                aacs.hasActiveSession(),
+                aacs.isCurrentSessionApproved(),
+                aacs.currentSessionLevel(),
+                aacs.currentSessionPersonId()
+            )
+            if (!ownerOnly) return false
+
+            val original = prefs.getString("owner_wardrobe_images", "[]") ?: "[]"
+            val root = java.io.File(filesDir, "ava-wardrobe").canonicalFile
+            val outcome = AvaWardrobeMediaMigration.migrateLegacyIndex(original, root)
+            if (!outcome.changed) return true
+
+            val stillOwnerOnly = AvaWardrobeMediaPolicy.canAccessOwnerMedia(
+                aacs.isPublicOnlyModeActive(),
+                aacs.hasActiveSession(),
+                aacs.isCurrentSessionApproved(),
+                aacs.currentSessionLevel(),
+                aacs.currentSessionPersonId()
+            )
+            if (!stillOwnerOnly) return false
+            if (!aacs.recordOwnerEvent(
+                    "WARDROBE_IMAGE_METADATA_MIGRATION_AUTHORIZED",
+                    "records=${outcome.migratedRecords}"
+                )
+            ) return false
+
+            val committed = prefs.edit()
+                .putString("owner_wardrobe_images", outcome.json)
+                .commit() &&
+                prefs.getString("owner_wardrobe_images", "[]") == outcome.json
+            if (committed) {
+                runCatching {
+                    aacs.recordOwnerEvent(
+                        "WARDROBE_IMAGE_METADATA_MIGRATION_COMPLETED",
+                        "records=${outcome.migratedRecords}"
+                    )
+                }
+                true
+            } else {
+                val rollbackOk = prefs.edit()
+                    .putString("owner_wardrobe_images", original)
+                    .commit() &&
+                    prefs.getString("owner_wardrobe_images", "[]") == original
+                runCatching {
+                    aacs.recordOwnerEvent(
+                        "WARDROBE_IMAGE_METADATA_MIGRATION_FAILED",
+                        "rollbackVerified=$rollbackOk"
+                    )
+                }
+                false
+            }
+        } catch (_: Exception) {
+            runCatching {
+                aacs.recordOwnerEvent(
+                    "WARDROBE_IMAGE_METADATA_MIGRATION_FAILED",
+                    "legacy metadata migration aborted"
+                )
+            }
+            false
+        }
     }
 
     private fun decodeWardrobePreview(file: java.io.File): android.graphics.Bitmap? {
