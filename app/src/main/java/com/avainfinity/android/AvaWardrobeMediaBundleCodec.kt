@@ -15,7 +15,6 @@ import java.security.MessageDigest
 import java.security.SecureRandom
 import java.util.UUID
 import javax.crypto.Cipher
-import javax.crypto.CipherInputStream
 import javax.crypto.CipherOutputStream
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.GCMParameterSpec
@@ -188,7 +187,7 @@ object AvaWardrobeMediaBundleCodec {
                 cipher.updateAAD(header)
                 val stagedEntries = mutableListOf<PreviewEntry>()
                 var totalBytes = 0L
-                CipherInputStream(bounded, cipher).use { decrypted ->
+                AuthenticatedCipherInputStream(bounded, cipher).use { decrypted ->
                     val data = DataInputStream(decrypted)
                     val manifestLength = data.readInt()
                     require(manifestLength in 1..MAX_MANIFEST_BYTES) { "Media manifest size is invalid." }
@@ -368,6 +367,69 @@ object AvaWardrobeMediaBundleCodec {
     }
 
     private fun ByteArray.toHex(): String = joinToString("") { "%02x".format(it.toInt() and 0xff) }
+
+    /**
+     * Streams GCM plaintext but always propagates doFinal() authentication failures.
+     * CipherInputStream implementations have historically differed in how they
+     * surface AEAD tag failures, so this wrapper makes final authentication explicit.
+     */
+    private class AuthenticatedCipherInputStream(
+        private val source: InputStream,
+        private val cipher: Cipher
+    ) : InputStream() {
+        private val encryptedBuffer = ByteArray(8192)
+        private var plaintext = ByteArray(0)
+        private var plaintextOffset = 0
+        private var finalized = false
+        private var closed = false
+
+        override fun read(): Int {
+            val one = ByteArray(1)
+            val count = read(one, 0, 1)
+            return if (count < 0) -1 else one[0].toInt() and 0xff
+        }
+
+        override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
+            if (closed) throw IOException("Decryption stream is closed.")
+            if (offset < 0 || length < 0 || length > buffer.size - offset) {
+                throw IndexOutOfBoundsException()
+            }
+            if (length == 0) return 0
+            if (!ensurePlaintext()) return -1
+            val count = minOf(length, plaintext.size - plaintextOffset)
+            System.arraycopy(plaintext, plaintextOffset, buffer, offset, count)
+            plaintextOffset += count
+            return count
+        }
+
+        private fun ensurePlaintext(): Boolean {
+            while (plaintextOffset >= plaintext.size) {
+                if (finalized) return false
+                val count = source.read(encryptedBuffer)
+                plaintextOffset = 0
+                if (count < 0) {
+                    // This is the only point at which the GCM tag is authenticated.
+                    // Any AEADBadTagException must escape and abort staging.
+                    plaintext = cipher.doFinal()
+                    finalized = true
+                } else if (count == 0) {
+                    continue
+                } else {
+                    plaintext = cipher.update(encryptedBuffer, 0, count) ?: ByteArray(0)
+                }
+            }
+            return plaintextOffset < plaintext.size
+        }
+
+        override fun close() {
+            if (!closed) {
+                closed = true
+                source.close()
+                plaintext.fill(0)
+                encryptedBuffer.fill(0)
+            }
+        }
+    }
 
     private class BoundedInputStream(input: InputStream, private val maxBytes: Long) : FilterInputStream(input) {
         var count: Long = 0
