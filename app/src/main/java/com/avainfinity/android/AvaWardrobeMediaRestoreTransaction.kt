@@ -195,6 +195,10 @@ object AvaWardrobeMediaRestoreTransaction {
                 promoted.forEach { runCatching { it.delete() } }
                 if (journalWritten) runCatching { journalFile.delete() }
                 stage.deleteRecursively()
+            } else if (promoted.isEmpty()) {
+                // The index changed before any live file was promoted; this transaction owns no live media.
+                if (journalWritten) runCatching { journalFile.delete() }
+                stage.deleteRecursively()
             } else if (!journalWritten) {
                 // No live file was promoted before the durable journal existed.
                 stage.deleteRecursively()
