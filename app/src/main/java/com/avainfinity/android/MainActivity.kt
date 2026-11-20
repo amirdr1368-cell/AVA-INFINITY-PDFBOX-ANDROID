@@ -3679,6 +3679,10 @@ class MainActivity : Activity() {
         }
         if (resultCode != RESULT_OK) {
             if (requestCode == 4103) pendingPersonPhotoId = null
+            if (requestCode == 4104) {
+                pendingWardrobePhotoName = null
+                pendingWardrobePhotoCategory = null
+            }
             if (requestCode == 5101) {
                 pendingBackupPassphrase?.fill('\u0000')
                 pendingBackupPassphrase = null
