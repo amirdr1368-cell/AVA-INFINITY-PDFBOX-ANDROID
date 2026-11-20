@@ -57,3 +57,13 @@ Implement only on `ava/mobile-app-integration`. Keep `master` untouched and PR #
 - Implementation is committed but has not yet been compiled or runtime-tested. No Build or GitHub Actions run was triggered.
 
 - Image previews are decoded as downsampled thumbnails (maximum 1200 px on the longest side) to reduce memory pressure on mobile devices; the original selected file remains stored privately.
+
+
+## Backup and recovery audit (2026-11-20)
+
+- Imported wardrobe image bytes are stored under the app-private `filesDir/ava-wardrobe` directory; their index is stored in encrypted `ava_ui` preferences.
+- The current encrypted backup payload in `AvaLocalStore.backupPayload()` exports memories, profiles, tasks, vocabulary, AACS portable state, and selected settings. It does not export the `owner_wardrobe_images` index or the image files.
+- Restore currently replaces supported memory/profile/settings data; it does not restore imported wardrobe images. Therefore app uninstall/data-clear or device migration can lose these images unless the owner keeps separate copies.
+- Added a visible warning on the wardrobe page so the owner is not misled into thinking the photos are already protected by encrypted backup.
+- Future safe implementation should add a versioned, size-bounded encrypted media bundle with integrity checks and restore staging. Do not silently base64-embed arbitrary image collections into the existing JSON backup payload or weaken the current archive size limits.
+- No build, test suite, Actions workflow, merge, or master-branch update was performed.
