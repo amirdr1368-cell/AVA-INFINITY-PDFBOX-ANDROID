@@ -51,6 +51,8 @@ class MainActivity : Activity() {
     private var pendingVocabularyAction: String? = null
     private var pendingVocabularyEntryId: String? = null
     private var pendingVocabularyTargetVersion: Int? = null
+    private var pendingWardrobePhotoName: String? = null
+    private var pendingWardrobePhotoCategory: String? = null
     private var accent = AvaGlassTheme.Lavender500
     private var deep = AvaGlassTheme.Night900
     private var lightTheme = false
@@ -1427,6 +1429,10 @@ class MainActivity : Activity() {
         heading.addView(label("همه مجموعه‌های تأییدشده آوا • بخش خصوصی فقط برای مالک قابل مشاهده است", 12f)
             .apply { setPadding(0, dp(6), 0, 0) })
         body.addView(heading)
+        body.addView(button("＋ افزودن تصویر از گوشی") { showAddWardrobeImageDialog() }
+            .apply { setMarginsCompat(top = 10) })
+        body.addView(label("تصاویر انتخابی تو در حافظه داخلی همین گوشی ذخیره می‌شوند و در همین بخش قابل مشاهده خواهند بود.", 11f)
+            .apply { setPadding(dp(2), dp(6), dp(2), 0) })
 
         try {
             val raw = assets.open("ava-wardrobe-catalog.json").bufferedReader(Charsets.UTF_8).use { it.readText() }
@@ -1490,6 +1496,34 @@ class MainActivity : Activity() {
             error.addView(label("خواندن یا اعتبارسنجی فایل کمد انجام نشد؛ داده‌ها تغییر داده نشدند.", 12f))
             body.addView(error)
         }
+        // Owner-added wardrobe images are stored privately in app-internal storage.
+        try {
+            val savedImages = org.json.JSONArray(prefs.getString("owner_wardrobe_images", "[]") ?: "[]")
+            if (savedImages.length() > 0) {
+                body.addView(label("تصاویر اضافه‌شده توسط امیر", 17f, accent).apply { setPadding(0, dp(18), 0, dp(4)) })
+                val imageRoot = java.io.File(filesDir, "ava-wardrobe").canonicalFile
+                for (index in 0 until savedImages.length()) {
+                    val item = savedImages.optJSONObject(index) ?: continue
+                    val file = java.io.File(item.optString("file", "")).canonicalFile
+                    if (!file.path.startsWith(imageRoot.path + java.io.File.separator) || !file.isFile) continue
+                    val entry = card().apply { setMarginsCompat(top = 8) }
+                    entry.addView(text(item.optString("name", "تصویر کمد"), 15f, accent, true))
+                    entry.addView(label(item.optString("categoryLabel", "بدون دسته"), 11f))
+                    val preview = ImageView(this).apply {
+                        adjustViewBounds = true
+                        scaleType = ImageView.ScaleType.FIT_CENTER
+                        setImageURI(Uri.fromFile(file))
+                        layoutParams = LinearLayout.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT, dp(220)
+                        ).apply { topMargin = dp(8) }
+                    }
+                    entry.addView(preview)
+                    body.addView(entry)
+                }
+            }
+        } catch (_: Exception) {
+            body.addView(label("خواندن تصاویر شخصی کمد انجام نشد؛ فایل‌های قبلی حفظ شدند.", 11f))
+        }
         try {
             val hairRaw = assets.open("ava-hairstyle-catalog.json").bufferedReader(Charsets.UTF_8).use { it.readText() }
             val hairCatalog = org.json.JSONObject(hairRaw)
@@ -1518,6 +1552,117 @@ class MainActivity : Activity() {
         }
         body.addView(button("بازگشت به مرکز آوا") { showPage("ava") }.apply { setMarginsCompat(top = 12) })
         contentArea.addView(body)
+    }
+
+    private fun showAddWardrobeImageDialog() {
+        val ownerOnly = aacs.hasActiveSession() &&
+            aacs.currentSessionPersonId() == "owner" &&
+            aacs.currentSessionLevel() == 1 &&
+            aacs.isCurrentSessionApproved() &&
+            !aacs.isPublicOnlyModeActive()
+        if (!ownerOnly) {
+            Toast.makeText(this, "برای افزودن تصویر، نشست تأییدشده مالک لازم است.", Toast.LENGTH_LONG).show()
+            return
+        }
+        val categories = arrayOf("اسپرت", "روزمره", "رسمی و شب", "لباس راحتی", "مجموعه خصوصی", "مدل مو", "سایر")
+        val keys = arrayOf("sporty", "everyday", "formal", "homewear", "private", "hairstyle", "other")
+        val input = EditText(this).apply {
+            hint = "نام لباس یا تصویر"
+            setSingleLine(true)
+        }
+        val spinner = Spinner(this).apply {
+            adapter = ArrayAdapter(this@MainActivity, android.R.layout.simple_spinner_dropdown_item, categories)
+        }
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(20), dp(8), dp(20), 0)
+            addView(input)
+            addView(label("دسته‌بندی تصویر", 12f).apply { setPadding(0, dp(10), 0, dp(2)) })
+            addView(spinner)
+        }
+        AlertDialog.Builder(this)
+            .setTitle("افزودن تصویر به کمد آوا")
+            .setView(container)
+            .setNegativeButton("انصراف", null)
+            .setPositiveButton("انتخاب عکس") { _, _ ->
+                pendingWardrobePhotoName = input.text.toString().trim().ifBlank { "تصویر جدید کمد" }
+                pendingWardrobePhotoCategory = keys[spinner.selectedItemPosition]
+                val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                    type = "image/*"
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
+                }
+                startActivityForResult(intent, 4104)
+            }.show()
+    }
+
+    private fun saveOwnerWardrobeImage(uri: Uri) {
+        val ownerOnly = aacs.hasActiveSession() &&
+            aacs.currentSessionPersonId() == "owner" &&
+            aacs.currentSessionLevel() == 1 &&
+            aacs.isCurrentSessionApproved() &&
+            !aacs.isPublicOnlyModeActive()
+        val name = pendingWardrobePhotoName
+        val category = pendingWardrobePhotoCategory
+        pendingWardrobePhotoName = null
+        pendingWardrobePhotoCategory = null
+        if (!ownerOnly || name.isNullOrBlank() || category.isNullOrBlank()) {
+            Toast.makeText(this, "نشست مالک معتبر نیست؛ تصویر ذخیره نشد.", Toast.LENGTH_LONG).show()
+            return
+        }
+        if (!aacs.recordOwnerEvent("WARDROBE_IMAGE_SAVE_REQUESTED", "category=$category")) {
+            Toast.makeText(this, "ثبت امنیتی ناموفق بود؛ تصویر ذخیره نشد.", Toast.LENGTH_LONG).show()
+            return
+        }
+        try {
+            val directory = java.io.File(filesDir, "ava-wardrobe").apply { if (!exists() && !mkdirs()) error("Cannot create private image directory") }
+            val extension = when (contentResolver.getType(uri)?.lowercase(Locale.ROOT)) {
+                "image/png" -> ".png"
+                "image/webp" -> ".webp"
+                "image/gif" -> ".gif"
+                else -> ".jpg"
+            }
+            val destination = java.io.File(directory, "wardrobe_" + java.util.UUID.randomUUID().toString() + extension)
+            var total = 0L
+            contentResolver.openInputStream(uri)?.use { input ->
+                java.io.FileOutputStream(destination).use { output ->
+                    val buffer = ByteArray(8192)
+                    while (true) {
+                        val count = input.read(buffer)
+                        if (count < 0) break
+                        total += count
+                        if (total > 15L * 1024L * 1024L) error("Image exceeds 15 MB")
+                        output.write(buffer, 0, count)
+                    }
+                }
+            } ?: error("Unable to read selected image")
+            val saved = org.json.JSONArray(prefs.getString("owner_wardrobe_images", "[]") ?: "[]")
+            val categoryLabel = when (category) {
+                "sporty" -> "اسپرت"
+                "everyday" -> "روزمره"
+                "formal" -> "رسمی و شب"
+                "homewear" -> "لباس راحتی"
+                "private" -> "مجموعه خصوصی"
+                "hairstyle" -> "مدل مو"
+                else -> "سایر"
+            }
+            saved.put(org.json.JSONObject().put("name", name).put("category", category)
+                .put("categoryLabel", categoryLabel).put("file", destination.canonicalPath)
+                .put("addedAt", System.currentTimeMillis()))
+            if (!prefs.edit().putString("owner_wardrobe_images", saved.toString()).commit()) error("Unable to save image index")
+            if (!aacs.recordOwnerEvent("WARDROBE_IMAGE_SAVED", "category=$category;bytes=$total")) {
+                saved.remove(saved.length() - 1)
+                prefs.edit().putString("owner_wardrobe_images", saved.toString()).commit()
+                destination.delete()
+                Toast.makeText(this, "ثبت امنیتی کامل نشد؛ تصویر جدید لغو شد.", Toast.LENGTH_LONG).show()
+                return
+            }
+            Toast.makeText(this, "تصویر به کمد آوا اضافه شد.", Toast.LENGTH_LONG).show()
+            showPage("wardrobe")
+        } catch (_: Exception) {
+            aacs.recordOwnerEvent("WARDROBE_IMAGE_SAVE_FAILED", "selected image could not be stored")
+            Toast.makeText(this, "ذخیره تصویر انجام نشد؛ اطلاعات قبلی حفظ شدند. حجم مجاز هر عکس ۱۵ مگابایت است.", Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun secretPage() {
@@ -3542,6 +3687,7 @@ class MainActivity : Activity() {
         }
         val uri = data?.data ?: return
         when (requestCode) {
+            4104 -> saveOwnerWardrobeImage(uri)
             5301 -> initializePrimaryVault(uri, data?.flags ?: 0)
             5302 -> handleMigrationCardSelection(uri, data?.flags ?: 0)
             5201 -> {
