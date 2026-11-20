@@ -10,8 +10,9 @@
     "requiresOwnerReauthentication": true
   },
   "counts": {
-    "approvedNumberedDesigns": 129,
-    "visualAssetsPending": 129
+    "approvedNumberedDesigns": 123,
+    "visualAssetsPending": 123,
+    "approvedCoreLooks": 4
   },
   "items": [
     {
@@ -1120,60 +1121,36 @@
       "description": "بادی فرم‌دهنده شامپاینی",
       "approval": "APPROVED_BY_AMIR",
       "assetStatus": "PENDING"
+    }
+  ],
+  "coreLooks": [
+    {
+      "id": "core-sporty",
+      "name": "Royal Lilac Sport",
+      "category": "sporty",
+      "approval": "APPROVED_BY_AMIR",
+      "description": "سویشرت ورزشی کوتاه یاسی، لگ فاق‌بلند، کتانی سفید و جزئیات رزگلد"
     },
     {
-      "id": 148,
-      "name": "Lilac Moon",
-      "category": "private",
-      "type": "nightdress",
-      "description": "لباس خواب بلند ساتن یاسی",
+      "id": "core-everyday",
+      "name": "Soft Casual",
+      "category": "everyday",
       "approval": "APPROVED_BY_AMIR",
-      "assetStatus": "PENDING"
+      "description": "کاردیگان کرم، تاپ سفید، شلوار بژ و کیف دوشی یاسی"
     },
     {
-      "id": 149,
-      "name": "Burgundy Lace",
-      "category": "private",
-      "type": "bodysuit",
-      "description": "بادی زرشکی با جزئیات توری",
+      "id": "core-formal",
+      "name": "Royal Lilac Evening",
+      "category": "formal",
       "approval": "APPROVED_BY_AMIR",
-      "assetStatus": "PENDING"
+      "description": "پیراهن میدی ساتن یاسی با کفش و اکسسوری رزگلد"
     },
     {
-      "id": 150,
-      "name": "Champagne Robe",
-      "category": "private",
-      "type": "robe",
-      "description": "کیمونوی ساتن شامپاینی",
+      "id": "core-homewear",
+      "name": "Cozy Lilac Home",
+      "category": "homewear",
       "approval": "APPROVED_BY_AMIR",
-      "assetStatus": "PENDING"
-    },
-    {
-      "id": 151,
-      "name": "Plum Whisper",
-      "category": "private",
-      "type": "loungewear",
-      "description": "ست راحتی ساتن آلویی",
-      "approval": "APPROVED_BY_AMIR",
-      "assetStatus": "PENDING"
-    },
-    {
-      "id": 152,
-      "name": "Royal Lace",
-      "category": "private",
-      "type": "lingerie_set",
-      "description": "ست یاسی با توری ظریف",
-      "approval": "APPROVED_BY_AMIR",
-      "assetStatus": "PENDING"
-    },
-    {
-      "id": 153,
-      "name": "Rose Infinity",
-      "category": "private",
-      "type": "nightdress",
-      "description": "لباس خواب ساتن رزگلد",
-      "approval": "APPROVED_BY_AMIR",
-      "assetStatus": "PENDING"
+      "description": "ست راحتی یاسی روشن با پارچه نرم و جزئیات صورتی"
     }
   ]
 }
