@@ -53,6 +53,7 @@ class MainActivity : Activity() {
     private var pendingVocabularyTargetVersion: Int? = null
     private var pendingWardrobePhotoName: String? = null
     private var pendingWardrobePhotoCategory: String? = null
+    private var pendingWardrobeMediaExportPassphrase: CharArray? = null
     private var accent = AvaGlassTheme.Lavender500
     private var deep = AvaGlassTheme.Night900
     private var lightTheme = false
@@ -1433,7 +1434,11 @@ class MainActivity : Activity() {
         body.addView(heading)
         body.addView(button("＋ افزودن تصویر از گوشی") { showAddWardrobeImageDialog() }
             .apply { setMarginsCompat(top = 10) })
-        body.addView(label("تصاویر انتخابی تو در حافظه داخلی همین گوشی ذخیره می‌شوند و در همین بخش قابل مشاهده خواهند بود.", 11f)
+        body.addView(button("🔐 ساخت پشتیبان رمزگذاری‌شده تصاویر") { requestWardrobeMediaExport() }
+            .apply { setMarginsCompat(top = 8) })
+        body.addView(button("📂 بررسی و پیش‌نمایش بازیابی تصاویر") { requestWardrobeMediaImport() }
+            .apply { setMarginsCompat(top = 6) })
+        body.addView(label("تصاویر انتخابی تو در حافظه داخلی همین گوشی ذخیره می‌شوند. پشتیبان تصاویر جدا از پشتیبان متنی آوا ساخته می‌شود و بازیابی فعلاً فقط پیش‌نمایش امن دارد؛ جایگزینی فایل‌های فعلی هنوز فعال نیست.", 11f)
             .apply { setPadding(dp(2), dp(6), dp(2), 0) })
         if (!migrateOwnerWardrobeImageIndex()) {
             body.addView(label("تکمیل اطلاعات تصاویر قدیمی انجام نشد؛ رکوردها و فایل‌های قبلی بدون تغییر باقی ماندند.", 11f, Color.rgb(190, 132, 75))
@@ -1566,6 +1571,187 @@ class MainActivity : Activity() {
         }
         body.addView(button("بازگشت به مرکز آوا") { showPage("ava") }.apply { setMarginsCompat(top = 12) })
         contentArea.addView(body)
+    }
+
+    private fun isCurrentOwnerMediaSession(): Boolean =
+        AvaWardrobeMediaPolicy.canAccessOwnerMedia(
+            aacs.isPublicOnlyModeActive(),
+            aacs.hasActiveSession(),
+            aacs.isCurrentSessionApproved(),
+            aacs.currentSessionLevel(),
+            aacs.currentSessionPersonId()
+        )
+
+    private fun requestWardrobeMediaExport() {
+        if (!isCurrentOwnerMediaSession()) {
+            Toast.makeText(this, "پشتیبان تصاویر فقط در نشست تأییدشده مالک ساخته می‌شود.", Toast.LENGTH_LONG).show()
+            return
+        }
+        passwordDialog("رمز مستقل پشتیبان تصاویر") { pass ->
+            if (!isCurrentOwnerMediaSession() ||
+                !aacs.recordOwnerEvent("WARDROBE_MEDIA_EXPORT_REQUESTED", "owner requested encrypted media companion")
+            ) {
+                pass.fill('\\u0000')
+                Toast.makeText(this, "مجوز مالک یا ثبت امنیتی تأیید نشد؛ خروجی ساخته نشد.", Toast.LENGTH_LONG).show()
+                return@passwordDialog
+            }
+            val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "application/octet-stream"
+                putExtra(Intent.EXTRA_TITLE, "AVA-WARDROBE-MEDIA.avawmb")
+            }
+            pendingWardrobeMediaExportPassphrase = pass
+            startActivityForResult(intent, 5401)
+        }
+    }
+
+    private fun requestWardrobeMediaImport() {
+        if (!isCurrentOwnerMediaSession()) {
+            Toast.makeText(this, "بررسی پشتیبان فقط در نشست تأییدشده مالک مجاز است.", Toast.LENGTH_LONG).show()
+            return
+        }
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "*/*"
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        startActivityForResult(intent, 5402)
+    }
+
+    private fun exportWardrobeMediaBundle(destinationUri: Uri, passphrase: CharArray) {
+        val temporaryBundle = java.io.File(cacheDir, "ava-wardrobe-export-${java.util.UUID.randomUUID()}.tmp")
+        var verificationStage: AvaWardrobeMediaBundleCodec.StagedPreview? = null
+        try {
+            if (!isCurrentOwnerMediaSession()) error("Owner session changed before export")
+            val rootDirectory = java.io.File(filesDir, "ava-wardrobe").canonicalFile
+            val index = org.json.JSONArray(prefs.getString("owner_wardrobe_images", "[]") ?: "[]")
+            require(index.length() <= AvaWardrobeMediaBundleCodec.MAX_ITEMS) { "Too many wardrobe images" }
+            val entries = mutableListOf<AvaWardrobeMediaBundleCodec.ExportEntry>()
+            for (position in 0 until index.length()) {
+                val item = index.optJSONObject(position) ?: error("Wardrobe index contains an invalid record")
+                val itemId = item.optString("itemId")
+                val displayName = item.optString("name").trim()
+                val category = item.optString("category")
+                val addedAt = item.optLong("addedAt", 0L)
+                val file = java.io.File(item.optString("file")).canonicalFile
+                require(itemId.isNotBlank() && displayName.isNotBlank() && category.isNotBlank() && addedAt > 0)
+                require(AvaWardrobeMediaPolicy.isSafeImageFile(rootDirectory, file))
+                entries.add(
+                    AvaWardrobeMediaBundleCodec.ExportEntry(
+                        itemId = itemId,
+                        displayName = displayName,
+                        category = category,
+                        addedAt = addedAt,
+                        file = file
+                    )
+                )
+            }
+            require(isCurrentOwnerMediaSession()) { "Owner session changed while preparing export" }
+            AvaWardrobeMediaBundleCodec.exportEncrypted(
+                destination = java.io.FileOutputStream(temporaryBundle),
+                wardrobeRoot = rootDirectory,
+                entries = entries,
+                passphrase = passphrase.copyOf()
+            )
+            verificationStage = java.io.FileInputStream(temporaryBundle).use { input ->
+                AvaWardrobeMediaBundleCodec.decryptToStaging(
+                    input,
+                    cacheDir,
+                    passphrase.copyOf(),
+                    AvaWardrobeAndroidImageValidator::isValidImageFile
+                )
+            }
+            require(verificationStage!!.entries.size == entries.size)
+            verificationStage!!.stagingDirectory.deleteRecursively()
+            verificationStage = null
+
+            require(isCurrentOwnerMediaSession()) { "Owner session changed before publishing export" }
+            contentResolver.openOutputStream(destinationUri, "w")?.use { output ->
+                java.io.FileInputStream(temporaryBundle).use { input -> input.copyTo(output) }
+                output.flush()
+            } ?: error("Unable to open selected export destination")
+
+            // Verify the bytes after the document provider has stored them.
+            verificationStage = contentResolver.openInputStream(destinationUri)?.use { input ->
+                AvaWardrobeMediaBundleCodec.decryptToStaging(
+                    input,
+                    cacheDir,
+                    passphrase.copyOf(),
+                    AvaWardrobeAndroidImageValidator::isValidImageFile
+                )
+            } ?: error("Unable to read back exported media bundle")
+            require(verificationStage!!.entries.size == entries.size)
+            verificationStage!!.stagingDirectory.deleteRecursively()
+            verificationStage = null
+
+            if (!aacs.recordOwnerEvent(
+                    "WARDROBE_MEDIA_EXPORT_VERIFIED",
+                    "items=${entries.size};bytes=${temporaryBundle.length()};provider=${destinationUri.authority}"
+                )
+            ) error("Security audit verification failed")
+            Toast.makeText(this, "پشتیبان تصاویر ساخته و از مقصد دوباره بررسی شد.", Toast.LENGTH_LONG).show()
+            showPage("wardrobe")
+        } catch (_: Exception) {
+            runCatching { aacs.recordOwnerEvent("WARDROBE_MEDIA_EXPORT_FAILED", "encrypted media export did not complete") }
+            Toast.makeText(this, "ساخت یا بررسی پشتیبان تصاویر کامل نشد؛ فایل‌های کمد تغییر نکردند.", Toast.LENGTH_LONG).show()
+        } finally {
+            verificationStage?.stagingDirectory?.deleteRecursively()
+            temporaryBundle.delete()
+            passphrase.fill('\\u0000')
+        }
+    }
+
+    private fun requestWardrobeMediaImportPassword(sourceUri: Uri) {
+        if (!isCurrentOwnerMediaSession()) {
+            Toast.makeText(this, "نشست مالک معتبر نیست؛ فایل بررسی نشد.", Toast.LENGTH_LONG).show()
+            return
+        }
+        passwordDialog("عبارت عبور پشتیبان تصاویر") { pass ->
+            var staged: AvaWardrobeMediaBundleCodec.StagedPreview? = null
+            try {
+                if (!isCurrentOwnerMediaSession() ||
+                    !aacs.recordOwnerEvent("WARDROBE_MEDIA_IMPORT_PREVIEW_REQUESTED", "owner requested isolated media preview")
+                ) error("Owner authorization or audit failed")
+                staged = contentResolver.openInputStream(sourceUri)?.use { input ->
+                    AvaWardrobeMediaBundleCodec.decryptToStaging(
+                        input,
+                        cacheDir,
+                        pass,
+                        AvaWardrobeAndroidImageValidator::isValidImageFile
+                    )
+                } ?: error("Unable to open selected media bundle")
+                if (!isCurrentOwnerMediaSession()) error("Owner session changed during preview")
+                if (!aacs.recordOwnerEvent(
+                        "WARDROBE_MEDIA_IMPORT_PREVIEW_AUTHENTICATED",
+                        "items=${staged!!.entries.size};bytes=${staged!!.totalBytes}"
+                    )
+                ) error("Audit confirmation failed")
+
+                val counts = staged!!.entries.groupingBy { it.category }.eachCount()
+                val categorySummary = counts.entries.joinToString("\\n") { "${it.key}: ${it.value}" }
+                    .ifBlank { "بسته خالی است." }
+                val message = "شناسه بسته: ${staged!!.bundleId}\\n" +
+                    "تاریخ ساخت: ${java.text.DateFormat.getDateTimeInstance().format(java.util.Date(staged!!.createdAt))}\\n" +
+                    "تعداد تصاویر: ${staged!!.entries.size}\\n" +
+                    "حجم کل: ${staged!!.totalBytes / 1024} KB\\n\\nدسته‌ها:\\n$categorySummary\\n\\n" +
+                    "اصالت رمزنگاری، اندازه، هش و رمزگشایی تصاویر بررسی شد. این فقط پیش‌نمایش است؛ هنوز هیچ فایلی به کمد فعلی منتقل یا جایگزین نمی‌شود."
+                val previewDialog = AlertDialog.Builder(this)
+                    .setTitle("پیش‌نمایش امن پشتیبان تصاویر")
+                    .setMessage(message)
+                    .setPositiveButton("بستن و پاک‌سازی فایل موقت", null)
+                    .create()
+                val stageToClean = staged!!.stagingDirectory
+                previewDialog.setOnDismissListener { stageToClean.deleteRecursively() }
+                previewDialog.show()
+                staged = null
+            } catch (_: Exception) {
+                runCatching { aacs.recordOwnerEvent("WARDROBE_MEDIA_IMPORT_PREVIEW_FAILED", "bundle authentication or validation failed") }
+                Toast.makeText(this, "پشتیبان معتبر نبود یا بررسی آن کامل نشد؛ هیچ تصویر فعلی تغییر نکرد.", Toast.LENGTH_LONG).show()
+            } finally {
+                staged?.stagingDirectory?.deleteRecursively()
+                pass.fill('\\u0000')
+            }
+        }
     }
 
     /**
@@ -3857,6 +4043,10 @@ class MainActivity : Activity() {
                 pendingWardrobePhotoName = null
                 pendingWardrobePhotoCategory = null
             }
+            if (requestCode == 5401) {
+                pendingWardrobeMediaExportPassphrase?.fill('\\u0000')
+                pendingWardrobeMediaExportPassphrase = null
+            }
             if (requestCode == 5101) {
                 pendingBackupPassphrase?.fill('\u0000')
                 pendingBackupPassphrase = null
@@ -3866,6 +4056,12 @@ class MainActivity : Activity() {
         val uri = data?.data ?: return
         when (requestCode) {
             4104 -> saveOwnerWardrobeImage(uri)
+            5401 -> {
+                val pass = pendingWardrobeMediaExportPassphrase
+                pendingWardrobeMediaExportPassphrase = null
+                if (pass != null) exportWardrobeMediaBundle(uri, pass)
+            }
+            5402 -> requestWardrobeMediaImportPassword(uri)
             5301 -> initializePrimaryVault(uri, data?.flags ?: 0)
             5302 -> handleMigrationCardSelection(uri, data?.flags ?: 0)
             5201 -> {
