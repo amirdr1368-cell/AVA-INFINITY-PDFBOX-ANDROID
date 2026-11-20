@@ -1715,6 +1715,16 @@ class MainActivity : Activity() {
                 .put("file", destinationPath)
                 .put("addedAt", System.currentTimeMillis()))
 
+            // Re-check the owner session immediately before the sensitive index commit.
+            val stillOwnerOnly = AvaWardrobeMediaPolicy.canAccessOwnerMedia(
+                aacs.isPublicOnlyModeActive(),
+                aacs.hasActiveSession(),
+                aacs.isCurrentSessionApproved(),
+                aacs.currentSessionLevel(),
+                aacs.currentSessionPersonId()
+            )
+            if (!stillOwnerOnly) error("Owner session changed before image commit")
+
             // Audit authorization must succeed before the index is committed.
             if (!aacs.recordOwnerEvent(
                     "WARDROBE_IMAGE_SAVE_COMMIT_AUTHORIZED",
@@ -1751,7 +1761,9 @@ class MainActivity : Activity() {
             showPage("wardrobe")
         } catch (_: Exception) {
             pendingImageFile?.delete()
-            aacs.recordOwnerEvent("WARDROBE_IMAGE_SAVE_FAILED", "selected image could not be stored")
+            runCatching {
+                aacs.recordOwnerEvent("WARDROBE_IMAGE_SAVE_FAILED", "selected image could not be stored")
+            }
             Toast.makeText(this, "ذخیره تصویر انجام نشد؛ اطلاعات قبلی حفظ شدند. حجم مجاز هر عکس ۱۵ مگابایت است.", Toast.LENGTH_LONG).show()
         }
     }
