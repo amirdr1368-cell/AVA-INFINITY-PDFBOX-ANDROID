@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "project": "AVA INFINITY",
+  "updated": "2026-11-20",
+  "note": "Image references are external inspiration links, not downloaded repository image assets.",
+  "items": [
+    {
+      "id": 1,
+      "name": "Messy High Bun",
+      "fa": "دم‌اسبی گوجه‌ای / گوجه‌ای بالای سر",
+      "description": "گوجه‌ای حجیم و کمی آزاد با چند تار موج‌دار کنار صورت؛ انتخاب اصلی امیر.",
+      "approval": "APPROVED_BY_AMIR",
+      "imageReference": "https://i.pinimg.com/736x/7a/24/10/7a241056c39d27ea165b461a228bdc58.jpg",
+      "source": "https://uk.pinterest.com/pin/22-prom-hairstyle-bun-ideas-for-a-stunning-glamorous-look-in-2024--863635666074810496/"
+    },
+    {
+      "id": 2,
+      "name": "Glossy High Ponytail",
+      "fa": "دم‌اسبی بلند و براق",
+      "description": "دم‌اسبی بلند و مرتب با یک دسته مو پیچیده دور کش مو.",
+      "approval": "AVA_STYLE_PICK",
+      "imageReference": "https://media.boldhairstyles.com/2026/04/espresso-ponytail-shiny-hair-69e6b506c03d4.webp",
+      "source": "https://boldhairstyles.com/23-brown-high-ponytails-that-stay-up-all-day/"
+    },
+    {
+      "id": 3,
+      "name": "Half-Up Soft Waves",
+      "fa": "نیمه‌باز با موج‌های نرم",
+      "description": "بخش بالایی مو جمع و پیچیده، باقی موها آزاد و موج‌دار.",
+      "approval": "AVA_STYLE_PICK",
+      "imageReference": "https://myquickurl.com/cheerlives.com/3-cheerlives_20241025160557.webp",
+      "source": "https://cheerlives.com/wave-it-up-11-wavy-hairstyles-for-everyone/"
+    },
+    {
+      "id": 4,
+      "name": "Low Messy Bun",
+      "fa": "گوجه‌ای پایین و رها",
+      "description": "گوجه‌ای پایین گردن با چند رشته آزاد در دو طرف صورت.",
+      "approval": "AVA_STYLE_PICK",
+      "imageReference": "https://www.cutsandhues.com/wp-content/uploads/low-messy-bun-with-soft-tendrils-768x1152.jpg",
+      "source": "https://www.cutsandhues.com/simple-hairstyles/"
+    },
+    {
+      "id": 5,
+      "name": "Side Braid & Waves",
+      "fa": "بافت کناری با موهای موج‌دار",
+      "description": "بافت ظریف کنار سر که به موهای بلند و موج‌دار می‌پیوندد.",
+      "approval": "AVA_STYLE_PICK",
+      "imageReference": "https://i.pinimg.com/736x/2d/f4/8e/2df48e0495f84241a8a4ccb6a5d2f7eb.jpg",
+      "source": "https://www.pinterest.com/pin/469641067376466336/"
+    },
+    {
+      "id": 6,
+      "name": "Claw-Clip French Twist",
+      "fa": "جمع فرانسوی با کلیپس",
+      "description": "جمع فرانسوی با کلیپس لاک‌پشتی و چند تار آزاد کنار صورت.",
+      "approval": "AVA_STYLE_PICK",
+      "imageReference": "https://media.haircelona.com/haircelona/2026/05/claw-clip-french-twist-hair-69f9fbacb6beb.webp",
+      "source": "https://haircelona.com/22-air-dry-hairstyles-for-wavy-long-hair/"
+    }
+  ]
+}
