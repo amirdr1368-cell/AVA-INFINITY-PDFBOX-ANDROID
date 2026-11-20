@@ -1689,7 +1689,8 @@ class MainActivity : Activity() {
             val destination = java.io.File(directory, "wardrobe_$fileId" + format.extension)
             if (!temporary.renameTo(destination)) error("Unable to finalize validated image")
             pendingImageFile = destination
-            val saved = org.json.JSONArray(prefs.getString("owner_wardrobe_images", "[]") ?: "[]")
+            val originalIndex = prefs.getString("owner_wardrobe_images", "[]") ?: "[]"
+            val saved = org.json.JSONArray(originalIndex)
             val categoryLabel = when (category) {
                 "sporty" -> "اسپرت"
                 "everyday" -> "روزمره"
@@ -1702,6 +1703,7 @@ class MainActivity : Activity() {
             val digestHex = imageDigest.digest().joinToString("") { byte ->
                 "%02x".format(Locale.ROOT, byte.toInt() and 0xff)
             }
+            val destinationPath = destination.canonicalPath
             saved.put(org.json.JSONObject()
                 .put("itemId", fileId)
                 .put("name", name)
@@ -1710,16 +1712,39 @@ class MainActivity : Activity() {
                 .put("mimeType", format.mimeType)
                 .put("byteLength", total)
                 .put("sha256", digestHex)
-                .put("file", destination.canonicalPath)
+                .put("file", destinationPath)
                 .put("addedAt", System.currentTimeMillis()))
-            if (!prefs.edit().putString("owner_wardrobe_images", saved.toString()).commit()) error("Unable to save image index")
-            if (!aacs.recordOwnerEvent("WARDROBE_IMAGE_SAVED", "category=$category;bytes=$total")) {
-                saved.remove(saved.length() - 1)
-                prefs.edit().putString("owner_wardrobe_images", saved.toString()).commit()
-                destination.delete()
-                pendingImageFile = null
-                Toast.makeText(this, "ثبت امنیتی کامل نشد؛ تصویر جدید لغو شد.", Toast.LENGTH_LONG).show()
-                return
+
+            // Audit authorization must succeed before the index is committed.
+            if (!aacs.recordOwnerEvent(
+                    "WARDROBE_IMAGE_SAVE_COMMIT_AUTHORIZED",
+                    "category=$category;bytes=$total"
+                )
+            ) error("Security audit authorization failed")
+
+            val nextIndex = saved.toString()
+            if (!prefs.edit().putString("owner_wardrobe_images", nextIndex).commit() ||
+                prefs.getString("owner_wardrobe_images", "[]") != nextIndex
+            ) {
+                // Restore the exact previous index and verify the rollback before cleanup.
+                val rollbackOk = prefs.edit()
+                    .putString("owner_wardrobe_images", originalIndex)
+                    .commit() &&
+                    prefs.getString("owner_wardrobe_images", "[]") == originalIndex
+                if (!rollbackOk) {
+                    // Keep the image if the live index still references it; never create a dangling record.
+                    val liveIndexReferencesImage = try {
+                        val live = org.json.JSONArray(prefs.getString("owner_wardrobe_images", "[]") ?: "[]")
+                        (0 until live.length()).any { index ->
+                            live.optJSONObject(index)?.optString("file") == destinationPath
+                        }
+                    } catch (_: Exception) {
+                        true
+                    }
+                    if (liveIndexReferencesImage) pendingImageFile = null
+                    error("Unable to commit wardrobe image index safely")
+                }
+                error("Unable to save image index")
             }
             pendingImageFile = null
             Toast.makeText(this, "تصویر به کمد آوا اضافه شد.", Toast.LENGTH_LONG).show()
