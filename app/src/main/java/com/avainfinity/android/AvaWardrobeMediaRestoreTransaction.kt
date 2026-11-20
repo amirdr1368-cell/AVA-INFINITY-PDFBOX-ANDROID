@@ -58,6 +58,9 @@ object AvaWardrobeMediaRestoreTransaction {
         val next = JSONArray(currentIndexJson)
         require(preview.entries.size <= AvaWardrobeMediaBundleCodec.MAX_ITEMS)
         require(preview.entries.map { it.itemId }.distinct().size == preview.entries.size)
+        require(preview.stagingDirectory.isDirectory)
+        require(preview.entries.sumOf { it.byteLength } == preview.totalBytes &&
+            preview.totalBytes <= AvaWardrobeMediaBundleCodec.MAX_TOTAL_BYTES)
         val additions = mutableListOf<AvaWardrobeMediaBundleCodec.PreviewEntry>()
         var unchanged = 0
         preview.entries.forEach { entry ->
@@ -67,6 +70,19 @@ object AvaWardrobeMediaRestoreTransaction {
             require(entry.byteLength in 1L..AvaWardrobeMediaBundleCodec.MAX_ITEM_BYTES)
             require(entry.sha256.matches(Regex("[0-9a-fA-F]{64}")))
             require(entry.stagedFile.canonicalFile.parentFile == preview.stagingDirectory.canonicalFile)
+            require(entry.stagedFile.isFile && entry.stagedFile.length() == entry.byteLength)
+            val header = ByteArray(12)
+            FileInputStream(entry.stagedFile).use { input ->
+                var offset = 0
+                while (offset < header.size) {
+                    val count = input.read(header, offset, header.size - offset)
+                    if (count < 0) break
+                    if (count > 0) offset += count
+                }
+                val detected = AvaWardrobeImageFormat.detect(header.copyOf(offset))
+                    ?: error("Staged restore image has an unsupported signature.")
+                require(detected.mimeType == entry.mimeType && entry.fileName.endsWith(detected.extension))
+            }
             require(isOwnerAuthorized()) { "Owner session changed during restore preparation." }
             val existing = byId[entry.itemId]
             if (existing != null) {
