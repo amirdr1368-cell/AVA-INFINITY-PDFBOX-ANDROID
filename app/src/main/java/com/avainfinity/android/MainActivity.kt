@@ -1753,13 +1753,9 @@ class MainActivity : Activity() {
             }
             val format = AvaWardrobeImageFormat.detect(header.copyOf(headerBytes))
                 ?: error("Unsupported or invalid image signature")
-            val bounds = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
-            android.graphics.BitmapFactory.decodeFile(temporary.absolutePath, bounds)
-            val width = bounds.outWidth
-            val height = bounds.outHeight
-            if (width <= 0 || height <= 0 || width > 12000 || height > 12000 ||
-                width.toLong() * height.toLong() > 40_000_000L
-            ) error("Image dimensions are invalid or exceed the safe limit")
+            if (!AvaWardrobeAndroidImageValidator.isValidImageFile(temporary)) {
+                error("Image failed bounded Android decoder validation")
+            }
 
             val destination = java.io.File(directory, "wardrobe_$fileId" + format.extension)
             if (!temporary.renameTo(destination)) error("Unable to finalize validated image")
