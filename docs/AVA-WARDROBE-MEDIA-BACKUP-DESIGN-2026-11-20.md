@@ -290,6 +290,7 @@ Commits:
 - `af49e40254499f1ca97d3e12c74fc1685e9e74aa` document export and preview UI behavior
 - `c6ae23de20c6b2d25176b4f4d8d41116a68d3894` export cleanup and non-empty bundle guard
 - `8b22bc6fc364f5921d772b79d79815c47d9970f1` preview line breaks and SAF cancellation secret cleanup
+- `e1d99172a071fc03ef3c39dac9e336b491c8d350` close temporary export stream on all validation paths and re-check owner after read-back
 - `0bea2f50a3f4618dad84d94b8128bef4f2cd03fc` explicit test callback updates
 
 Verification status:
