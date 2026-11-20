@@ -225,7 +225,7 @@ class MainActivity : Activity() {
         text(value, size.coerceAtLeast(11f), secondaryTextColor)
 
     private fun label(value: String, size: Float, color: Int): TextView =
-        text(value, size, color)
+        text(value, size.coerceAtLeast(11f), color)
 
     private fun button(value: String, onClick: () -> Unit): TextView =
         createButton(value, secondary = false, onClick = onClick)
@@ -352,7 +352,7 @@ class MainActivity : Activity() {
             setPadding(0, dp(2), 0, dp(12))
             overScrollMode = View.OVER_SCROLL_IF_CONTENT_SCROLLS
         }
-        scroll.addView(content, ScrollView.LayoutParams(
+        scroll.addView(content, FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
         ))
