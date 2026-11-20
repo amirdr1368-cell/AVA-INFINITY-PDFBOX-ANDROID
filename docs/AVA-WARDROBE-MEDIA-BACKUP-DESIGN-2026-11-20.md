@@ -179,7 +179,7 @@ Commits:
 Verification status:
 - Source changes were committed through GitHub and are pending a final source read-back review.
 - Unit tests have not been executed. No Gradle test, APK build or GitHub Actions run has been performed.
-- Header detection plus Android bounds decoding is an import hardening step, not a complete hostile-file decoder sandbox. The portable media backup/restore feature remains unimplemented.
+- Header detection plus Android bounds and sampled-pixel decoding is an import hardening step, not a complete hostile-file decoder sandbox. The portable media backup/restore feature remains unimplemented.
 
 
 ### Additive metadata for newly imported images
@@ -273,8 +273,8 @@ Implemented on `ava/mobile-app-integration` as an isolated codec only:
 - Streams image bytes through the cipher. The manifest contains generated filenames and metadata only; device-local absolute paths and provider URIs are never serialized.
 - Enforces 200 items, 15 MiB per image, 100 MiB aggregate uncompressed image data, 1 MiB manifest, and a bounded encrypted input size.
 - Validates UUIDv4 IDs, category keys, generated filenames, image signatures, filename-extension/MIME consistency, lengths, SHA-256 digests, duplicate IDs/names, and aggregate sizes.
-- Decryption writes only to a newly created private staging directory. The GCM tag must authenticate before a staged preview is returned. Any failure removes the newly created staging directory.
-- The decoder requires a caller-supplied platform image-validation callback, so the future Android integration must perform bounded BitmapFactory decode/dimension checks before a preview can be considered ready.
+- Decryption writes only to a newly created private staging directory. A dedicated streaming input wrapper calls `Cipher.doFinal()` explicitly and propagates GCM authentication failures before a staged preview is returned. Any failure removes the newly created staging directory.
+- The decoder requires a caller-supplied platform image-validation callback. `AvaWardrobeAndroidImageValidator` now checks BitmapFactory bounds (maximum 12,000 px edge and 40 million pixels) and performs a sampled decode capped around a 1,200 px edge. The same validator is used when saving new owner images.
 - The callback is mandatory rather than defaulted to permissive behavior; a caller that cannot validate staged image dimensions must fail closed.
 - The codec never changes the live wardrobe index or files. Applying a restore remains a separate, not-yet-implemented transaction requiring owner confirmation and rollback.
 
@@ -282,6 +282,9 @@ Commits:
 - `8670009d87b4130cd422deaf5797946db945ec6c` streaming AES-GCM codec
 - `696ba98c1dd4d4450ec902a11ee1edfed497af42` initial codec tests
 - `cbc99ad3181c79d6bd6653b49c7895c8d4e8c21d` key cleanup and mandatory platform validation callback
+- `57c48824eddbb5e0066f9d558f7286045582f103` bounded Android image decoder validator
+- `1b326322fabf6eae82a5932ca4bebcf978d0b3b5` apply decoder validation when saving owner images
+- `046bda95d3e5665e60bb649104fd20bb4da0c6d2` explicit AES-GCM final-tag verification during streaming decryption
 - `0bea2f50a3f4618dad84d94b8128bef4f2cd03fc` explicit test callback updates
 
 Verification status:
