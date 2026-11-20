@@ -31,6 +31,14 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v4
 
+      # Persist the debug-only key so future .next test builds can update each other.
+      # This is not a production release-signing key.
+      - name: Restore stable debug signing key
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: ava-infinity-debug-keystore-v1
+
       - name: Set up Gradle wrapper
         uses: gradle/actions/setup-gradle@v4
 
