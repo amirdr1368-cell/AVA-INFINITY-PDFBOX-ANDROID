@@ -34,6 +34,10 @@ class AvaWardrobeMediaPolicyTest {
 
             val wrongName = java.io.File(root, "photo.jpg").apply { writeBytes(byteArrayOf(1)) }
             assertFalse(AvaWardrobeMediaPolicy.isSafeImageFile(root, wrongName))
+            
+            val malformedUuid = java.io.File(root, "wardrobe_------------------------------------.jpg")
+                .apply { writeBytes(byteArrayOf(1)) }
+            assertFalse(AvaWardrobeMediaPolicy.isSafeImageFile(root, malformedUuid))
 
             val outside = java.io.File(base, "wardrobe_123e4567-e89b-12d3-a456-426614174001.jpg")
                 .apply { writeBytes(byteArrayOf(1)) }
