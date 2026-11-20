@@ -180,3 +180,19 @@ Verification status:
 - Source changes were committed through GitHub and are pending a final source read-back review.
 - Unit tests have not been executed. No Gradle test, APK build or GitHub Actions run has been performed.
 - Header detection plus Android bounds decoding is an import hardening step, not a complete hostile-file decoder sandbox. The portable media backup/restore feature remains unimplemented.
+
+
+### Additive metadata for newly imported images
+
+A follow-up source change adds portable metadata to newly imported index records while retaining all existing legacy fields:
+- `itemId`: generated UUID corresponding to the safe generated filename.
+- `mimeType`: detected from the actual image signature.
+- `byteLength`: measured during the bounded streaming copy.
+- `sha256`: calculated incrementally during that same copy.
+- The device-local canonical `file` path remains local-only and must never be exported.
+
+This is a backward-compatible additive write for new records; no automatic rewrite of existing legacy records has been performed. Existing entries remain readable and will need validation/metadata derivation during a future explicit migration or export.
+
+Commit: `114b7683f431f4a2b5c5f716ced8f582f016f126`.
+
+Tests and build remain unexecuted.
