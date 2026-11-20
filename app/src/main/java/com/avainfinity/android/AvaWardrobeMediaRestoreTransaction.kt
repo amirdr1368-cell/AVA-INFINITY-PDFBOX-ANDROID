@@ -181,8 +181,8 @@ object AvaWardrobeMediaRestoreTransaction {
                 "Security audit commit record failed."
             }
 
-            journalFile.delete()
-            stage.deleteRecursively()
+            require(!stage.exists() || stage.deleteRecursively()) { "Unable to clean restore staging data." }
+            require(journalFile.delete() || !journalFile.exists()) { "Unable to finalize restore journal cleanup." }
             return Result(additions.size, unchanged, nextJson)
         } catch (failure: Exception) {
             val currentAfterFailure = runCatching { readIndex() }.getOrNull()
@@ -192,14 +192,16 @@ object AvaWardrobeMediaRestoreTransaction {
                 throw failure
             }
             if (currentAfterFailure == currentIndexJson) {
-                runCatching { writeIndex(currentIndexJson) }
-                promoted.forEach { runCatching { it.delete() } }
-                if (journalWritten) runCatching { journalFile.delete() }
-                stage.deleteRecursively()
+                val removed = promoted.all { file ->
+                    val expected = additions.firstOrNull { it.fileName == file.name }?.sha256
+                    !file.exists() || (expected != null && sha256(file).equals(expected, true) && file.delete())
+                }
+                val stageCleaned = !stage.exists() || stage.deleteRecursively()
+                if (removed && stageCleaned && journalWritten) runCatching { journalFile.delete() }
             } else if (promoted.isEmpty()) {
                 // The index changed before any live file was promoted; this transaction owns no live media.
-                if (journalWritten) runCatching { journalFile.delete() }
-                stage.deleteRecursively()
+                val stageCleaned = !stage.exists() || stage.deleteRecursively()
+                if (stageCleaned && journalWritten) runCatching { journalFile.delete() }
             } else if (!journalWritten) {
                 // No live file was promoted before the durable journal existed.
                 stage.deleteRecursively()
@@ -274,9 +276,11 @@ object AvaWardrobeMediaRestoreTransaction {
             } else {
                 return false
             }
-            stage.deleteRecursively()
+            require(!stage.exists() || stage.deleteRecursively()) { "Unable to clean recovered staging data." }
+            require(audit("WARDROBE_MEDIA_RESTORE_RECOVERY_COMPLETED", "transaction=${journal.optString("transactionId") }")) {
+                "Recovery completion audit failed; journal retained for retry."
+            }
             require(journalFile.delete() || !journalFile.exists())
-            audit("WARDROBE_MEDIA_RESTORE_RECOVERY_COMPLETED", "transaction=${journal.optString("transactionId")}")
         } catch (_: Exception) {
             false
         }
