@@ -1129,28 +1129,41 @@
       "name": "Royal Lilac Sport",
       "category": "sporty",
       "approval": "APPROVED_BY_AMIR",
-      "description": "سویشرت ورزشی کوتاه یاسی، لگ فاق‌بلند، کتانی سفید و جزئیات رزگلد"
+      "description": "سویشرت ورزشی کوتاه یاسی، لگ فاق‌بلند، کتانی سفید و جزئیات رزگلد",
+      "imageReference": "https://d1pzraxr35z0i4.cloudfront.net/media/97/71/c3/1743684058/OLAVOGA-sklep-komplet-CAPTAIN-MORGAN-012-pasuri-pl.webp?ts=1743684058",
+      "imageSource": "https://pasuri.pl/en/OLAVOGA-CAPTAIN-MORGAN-women-s-sports-set-Lila",
+      "assetStatus": "EXTERNAL_REFERENCE_ONLY"
     },
     {
       "id": "core-everyday",
       "name": "Soft Casual",
       "category": "everyday",
       "approval": "APPROVED_BY_AMIR",
-      "description": "کاردیگان کرم، تاپ سفید، شلوار بژ و کیف دوشی یاسی"
+      "description": "کاردیگان کرم، تاپ سفید، شلوار بژ و کیف دوشی یاسی",
+      "imageReference": "https://api.fastretailing.com/ugc/v1/plst/jp/SR_IMAGES/ugc_stylehint_plst_jp_photo_240706_1379297_r-1000-1333",
+      "imageSource": "https://www.plst.com/jp/ja/stylingbook/stylehint/5550742",
+      "assetStatus": "EXTERNAL_REFERENCE_ONLY"
     },
     {
       "id": "core-formal",
       "name": "Royal Lilac Evening",
       "category": "formal",
       "approval": "APPROVED_BY_AMIR",
-      "description": "پیراهن میدی ساتن یاسی با کفش و اکسسوری رزگلد"
+      "description": "پیراهن میدی ساتن یاسی با کفش و اکسسوری رزگلد",
+      "imageReference": "https://elonnashop.com/cdn/shop/files/13f9a7e7f3b8a8b583ec36fc0cbf874e.jpg?v=1719305953",
+      "imageSource": "https://elonnashop.com/products/one-shoulder-split-thigh-satin-party-dresses",
+      "assetStatus": "EXTERNAL_REFERENCE_ONLY"
     },
     {
       "id": "core-homewear",
       "name": "Cozy Lilac Home",
       "category": "homewear",
       "approval": "APPROVED_BY_AMIR",
-      "description": "ست راحتی یاسی روشن با پارچه نرم و جزئیات صورتی"
+      "description": "ست راحتی یاسی روشن با پارچه نرم و جزئیات صورتی",
+      "imageReference": "https://vybe.pk/cdn/shop/files/VYBENewPjsPackshotsLilac1.png?v=1769433686&width=1024",
+      "imageSource": "https://vybe.pk/products/cloud-pajama-set-lilac",
+      "assetStatus": "EXTERNAL_REFERENCE_ONLY"
     }
-  ]
+  ],
+  "imageAssetPolicy": "External image references are inspiration links only. They are not bundled local image files and must not be represented as downloaded assets."
 }
