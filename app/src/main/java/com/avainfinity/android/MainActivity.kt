@@ -1648,12 +1648,14 @@ class MainActivity : Activity() {
                 )
             }
             require(isCurrentOwnerMediaSession()) { "Owner session changed while preparing export" }
-            AvaWardrobeMediaBundleCodec.exportEncrypted(
-                destination = java.io.FileOutputStream(temporaryBundle),
-                wardrobeRoot = rootDirectory,
-                entries = entries,
-                passphrase = passphrase.copyOf()
-            )
+            java.io.FileOutputStream(temporaryBundle).use { temporaryOutput ->
+                AvaWardrobeMediaBundleCodec.exportEncrypted(
+                    destination = temporaryOutput,
+                    wardrobeRoot = rootDirectory,
+                    entries = entries,
+                    passphrase = passphrase.copyOf()
+                )
+            }
             verificationStage = java.io.FileInputStream(temporaryBundle).use { input ->
                 AvaWardrobeMediaBundleCodec.decryptToStaging(
                     input,
@@ -1686,6 +1688,7 @@ class MainActivity : Activity() {
             require(verificationStage!!.entries.size == entries.size)
             verificationStage!!.stagingDirectory.deleteRecursively()
             verificationStage = null
+            require(isCurrentOwnerMediaSession()) { "Owner session changed after destination verification" }
 
             if (!aacs.recordOwnerEvent(
                     "WARDROBE_MEDIA_EXPORT_VERIFIED",
