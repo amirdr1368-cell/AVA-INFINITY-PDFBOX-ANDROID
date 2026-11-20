@@ -340,6 +340,8 @@ Tests added:
 - same ID with different digest is rejected without changing current files;
 - stale index changes abort before journal creation or live promotion;
 - recovery refuses to delete a file whose digest does not match the transaction journal;
+- recovery rolls back only files whose digest matches the journal when the old index is still active;
+- a failed recovery-completion audit leaves the journal for a safe retry;
 - a committed index with an incomplete final audit leaves a journal that recovery can safely finalize.
 
 Verification boundary:
