@@ -152,7 +152,9 @@ object AvaWardrobeMediaRestoreTransaction {
                 .put("transactionId", transactionId)
                 .put("oldIndexSha256", oldDigest)
                 .put("nextIndexSha256", nextDigest)
-                .put("promotedFiles", JSONArray(additions.map { it.fileName }))
+                .put("promotedFiles", JSONArray(additions.map {
+                    JSONObject().put("name", it.fileName).put("sha256", it.sha256)
+                }))
                 .put("stageDirectory", stage.name)
             writeJournalAtomically(journalFile, journal)
             journalWritten = true
@@ -167,6 +169,7 @@ object AvaWardrobeMediaRestoreTransaction {
             }
 
             require(isOwnerAuthorized()) { "Owner session changed before index commit." }
+            require(readIndex() == currentIndexJson) { "Wardrobe index changed during restore; refusing to overwrite newer data." }
             require(audit("WARDROBE_MEDIA_RESTORE_FILES_STAGED", "bundle=${preview.bundleId};added=${additions.size}")) {
                 "Security audit failed before index commit."
             }
@@ -231,22 +234,37 @@ object AvaWardrobeMediaRestoreTransaction {
             val stage = File(journalDirectory.canonicalFile, stageName)
             val files = journal.getJSONArray("promotedFiles")
             if (currentDigest == nextDigest) {
-                // New index is live. Confirm every transaction-owned file is present and indexed.
+                // New index is live. Verify each promoted file against both journal and index.
                 val currentArray = JSONArray(current)
-                val indexedPaths = (0 until currentArray.length()).mapNotNull { currentArray.optJSONObject(it)?.optString("file") }.toSet()
+                val indexedByPath = (0 until currentArray.length()).mapNotNull { currentArray.optJSONObject(it) }
+                    .associateBy { it.optString("file") }
                 for (i in 0 until files.length()) {
-                    val name = files.getString(i)
+                    val item = files.getJSONObject(i)
+                    val name = item.getString("name")
+                    val expectedDigest = item.getString("sha256")
                     require(name.matches(Regex("wardrobe_[0-9a-fA-F-]{36}\\.(jpg|png|gif|webp)")))
+                    require(expectedDigest.matches(Regex("[0-9a-fA-F]{64}")))
                     val promoted = File(root.canonicalFile, name).canonicalFile
-                    require(promoted.parentFile == root.canonicalFile && promoted.isFile && promoted.absolutePath in indexedPaths)
+                    val indexed = indexedByPath[promoted.absolutePath]
+                    require(promoted.parentFile == root.canonicalFile && promoted.isFile &&
+                        indexed != null && indexed.optString("sha256").equals(expectedDigest, true) &&
+                        sha256(promoted).equals(expectedDigest, true))
                 }
             } else if (currentDigest == oldDigest) {
                 for (i in 0 until files.length()) {
-                    val name = files.getString(i)
+                    val item = files.getJSONObject(i)
+                    val name = item.getString("name")
+                    val expectedDigest = item.getString("sha256")
                     require(name.matches(Regex("wardrobe_[0-9a-fA-F-]{36}\\.(jpg|png|gif|webp)")))
+                    require(expectedDigest.matches(Regex("[0-9a-fA-F]{64}")))
                     val rollbackFile = File(root.canonicalFile, name).canonicalFile
                     require(rollbackFile.parentFile == root.canonicalFile)
-                    rollbackFile.delete()
+                    if (rollbackFile.exists()) {
+                        require(rollbackFile.isFile && sha256(rollbackFile).equals(expectedDigest, true)) {
+                            "Refusing to delete a file not matching this restore transaction."
+                        }
+                        require(rollbackFile.delete()) { "Unable to roll back a promoted restore file." }
+                    }
                 }
             } else {
                 return false
