@@ -1508,8 +1508,13 @@ class MainActivity : Activity() {
                 val imageRoot = java.io.File(filesDir, "ava-wardrobe").canonicalFile
                 for (index in 0 until savedImages.length()) {
                     val item = savedImages.optJSONObject(index) ?: continue
-                    val file = java.io.File(item.optString("file", "")).canonicalFile
-                    if (!file.path.startsWith(imageRoot.path + java.io.File.separator) || !file.isFile) continue
+                    val storedPath = item.optString("file", "")
+                    val file = try {
+                        java.io.File(storedPath).canonicalFile
+                    } catch (_: Exception) {
+                        continue
+                    }
+                    if (!AvaWardrobeMediaPolicy.isSafeImageFile(imageRoot, file)) continue
                     val entry = card().apply { setMarginsCompat(top = 8) }
                     entry.addView(text(item.optString("name", "تصویر کمد"), 15f, accent, true))
                     entry.addView(label(item.optString("categoryLabel", "بدون دسته"), 11f))
