@@ -1512,7 +1512,7 @@ class MainActivity : Activity() {
                     val preview = ImageView(this).apply {
                         adjustViewBounds = true
                         scaleType = ImageView.ScaleType.FIT_CENTER
-                        setImageURI(Uri.fromFile(file))
+                        setImageBitmap(decodeWardrobePreview(file))
                         layoutParams = LinearLayout.LayoutParams(
                             ViewGroup.LayoutParams.MATCH_PARENT, dp(220)
                         ).apply { topMargin = dp(8) }
@@ -1552,6 +1552,22 @@ class MainActivity : Activity() {
         }
         body.addView(button("بازگشت به مرکز آوا") { showPage("ava") }.apply { setMarginsCompat(top = 12) })
         contentArea.addView(body)
+    }
+
+    private fun decodeWardrobePreview(file: java.io.File): android.graphics.Bitmap? {
+        return try {
+            val bounds = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
+            android.graphics.BitmapFactory.decodeFile(file.absolutePath, bounds)
+            if (bounds.outWidth <= 0 || bounds.outHeight <= 0) return null
+            var sample = 1
+            while (bounds.outWidth / sample > 1200 || bounds.outHeight / sample > 1200) {
+                sample *= 2
+            }
+            val options = android.graphics.BitmapFactory.Options().apply { inSampleSize = sample }
+            android.graphics.BitmapFactory.decodeFile(file.absolutePath, options)
+        } catch (_: Exception) {
+            null
+        }
     }
 
     private fun showAddWardrobeImageDialog() {
