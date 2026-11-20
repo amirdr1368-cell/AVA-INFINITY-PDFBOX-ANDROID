@@ -161,13 +161,16 @@ object AvaWardrobeMediaRestoreTransaction {
                 // Keep the promoted files and journal so recovery can finish the commit safely.
                 throw failure
             }
-            if (currentAfterFailure == currentIndexJson || currentAfterFailure == null) {
+            if (currentAfterFailure == currentIndexJson) {
                 runCatching { writeIndex(currentIndexJson) }
                 promoted.forEach { runCatching { it.delete() } }
                 if (journalWritten) runCatching { journalFile.delete() }
                 stage.deleteRecursively()
+            } else if (!journalWritten) {
+                // No live file was promoted before the durable journal existed.
+                stage.deleteRecursively()
             }
-            // If the index is neither old nor new, preserve files and journal for manual recovery.
+            // If the index is unreadable or neither old nor new, preserve journal and promoted files.
             throw failure
         }
     }
