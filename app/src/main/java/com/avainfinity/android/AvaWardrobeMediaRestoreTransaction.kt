@@ -23,6 +23,7 @@ object AvaWardrobeMediaRestoreTransaction {
     private const val JOURNAL_NAME = "ava-wardrobe-media-restore-journal.json"
     private const val JOURNAL_VERSION = 1
 
+    @Synchronized
     fun apply(
         root: File,
         journalDirectory: File,
@@ -206,6 +207,7 @@ object AvaWardrobeMediaRestoreTransaction {
      * temporary state is removed. If it matches the old digest, promoted files
      * are rolled back. Any third state fails closed and preserves the journal.
      */
+    @Synchronized
     fun recover(
         root: File,
         journalDirectory: File,
@@ -263,7 +265,7 @@ object AvaWardrobeMediaRestoreTransaction {
             output.write(journal.toString().toByteArray(Charsets.UTF_8))
             output.fd.sync()
         }
-        if (target.exists()) require(target.delete())
+        require(!target.exists()) { "A restore recovery journal already exists." }
         require(temporary.renameTo(target)) { "Unable to persist restore recovery journal." }
     }
 
