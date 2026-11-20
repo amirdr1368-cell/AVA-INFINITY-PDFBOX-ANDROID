@@ -297,6 +297,7 @@ object AvaWardrobeMediaRestoreTransaction {
                 "Recovery completion audit failed; journal retained for retry."
             }
             require(journalFile.delete() || !journalFile.exists())
+            true
         } catch (_: Exception) {
             false
         }
