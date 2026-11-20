@@ -1490,6 +1490,32 @@ class MainActivity : Activity() {
             error.addView(label("خواندن یا اعتبارسنجی فایل کمد انجام نشد؛ داده‌ها تغییر داده نشدند.", 12f))
             body.addView(error)
         }
+        try {
+            val hairRaw = assets.open("ava-hairstyle-catalog.json").bufferedReader(Charsets.UTF_8).use { it.readText() }
+            val hairCatalog = org.json.JSONObject(hairRaw)
+            if (hairCatalog.optInt("schemaVersion", -1) != 1) throw IllegalStateException("Unsupported hairstyle schema")
+            val hairItems = hairCatalog.optJSONArray("items") ?: org.json.JSONArray()
+            body.addView(label("استودیوی مدل مو آوا", 17f, accent).apply { setPadding(0, dp(18), 0, dp(4)) })
+            for (index in 0 until hairItems.length()) {
+                val style = hairItems.optJSONObject(index) ?: continue
+                val name = style.optString("name").trim()
+                val fa = style.optString("fa").trim()
+                val description = style.optString("description").trim()
+                val imageReference = style.optString("imageReference").trim()
+                val source = style.optString("source").trim()
+                if (name.isBlank() || fa.isBlank()) continue
+                val entry = card().apply { setMarginsCompat(top = 8) }
+                entry.addView(text("${style.optInt("id")}. $fa • $name", 15f, accent, true))
+                entry.addView(label(description, 12f).apply { setPadding(0, dp(4), 0, 0) })
+                entry.addView(label(if (index == 0) "انتخاب امیر • مدل اصلی" else "پیشنهاد استایل آوا", 10f)
+                    .apply { setPadding(0, dp(4), 0, 0) })
+                if (imageReference.isNotBlank()) entry.addView(label("مرجع تصویر: $imageReference", 9f))
+                if (source.isNotBlank()) entry.addView(label("منبع: $source", 9f))
+                body.addView(entry)
+            }
+        } catch (_: Exception) {
+            body.addView(label("کاتالوگ مدل مو فعلاً در دسترس نیست.", 11f))
+        }
         body.addView(button("بازگشت به مرکز آوا") { showPage("ava") }.apply { setMarginsCompat(top = 12) })
         contentArea.addView(body)
     }
