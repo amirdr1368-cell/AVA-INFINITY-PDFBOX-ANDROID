@@ -275,6 +275,7 @@ Implemented on `ava/mobile-app-integration` as an isolated codec only:
 - Validates UUIDv4 IDs, category keys, generated filenames, image signatures, filename-extension/MIME consistency, lengths, SHA-256 digests, duplicate IDs/names, and aggregate sizes.
 - Decryption writes only to a newly created private staging directory. The GCM tag must authenticate before a staged preview is returned. Any failure removes the newly created staging directory.
 - The decoder requires a caller-supplied platform image-validation callback, so the future Android integration must perform bounded BitmapFactory decode/dimension checks before a preview can be considered ready.
+- The callback is mandatory rather than defaulted to permissive behavior; a caller that cannot validate staged image dimensions must fail closed.
 - The codec never changes the live wardrobe index or files. Applying a restore remains a separate, not-yet-implemented transaction requiring owner confirmation and rollback.
 
 Commits:
@@ -285,7 +286,7 @@ Commits:
 
 Verification status:
 - Codec and tests were fetched back from GitHub and inspected.
-- Five JVM tests are present for multi-format round trip, wrong passphrase, authentication-tag tampering, truncation, unsafe export path and duplicate IDs.
+- Six JVM tests are present for multi-format round trip, wrong passphrase, authentication-tag tampering, truncation, unsafe export path, duplicate IDs, and platform decoder rejection cleanup.
 - Tests have not been executed. No Gradle task, APK build or GitHub Actions workflow has been run.
 - No UI export/restore flow is wired to this codec yet.
 
