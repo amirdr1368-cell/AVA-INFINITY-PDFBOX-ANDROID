@@ -1438,7 +1438,7 @@ class MainActivity : Activity() {
             .apply { setMarginsCompat(top = 8) })
         body.addView(button("📂 بررسی و پیش‌نمایش بازیابی تصاویر") { requestWardrobeMediaImport() }
             .apply { setMarginsCompat(top = 6) })
-        body.addView(label("تصاویر انتخابی تو در حافظه داخلی همین گوشی ذخیره می‌شوند. پشتیبان تصاویر جدا از پشتیبان متنی آوا ساخته می‌شود و بازیابی فعلاً فقط پیش‌نمایش امن دارد؛ جایگزینی فایل‌های فعلی هنوز فعال نیست.", 11f)
+        body.addView(label("تصاویر در حافظه خصوصی گوشی ذخیره می‌شوند. بازیابی فقط به‌شکل ادغام امن انجام می‌شود؛ فایل‌های فعلی جایگزین یا حذف نمی‌شوند.", 11f)
             .apply { setPadding(dp(2), dp(6), dp(2), 0) })
         if (!migrateOwnerWardrobeImageIndex()) {
             body.addView(label("تکمیل اطلاعات تصاویر قدیمی انجام نشد؛ رکوردها و فایل‌های قبلی بدون تغییر باقی ماندند.", 11f, Color.rgb(190, 132, 75))
@@ -1744,13 +1744,33 @@ class MainActivity : Activity() {
                     "تعداد تصاویر: ${staged!!.entries.size}\\n" +
                     "حجم کل: ${staged!!.totalBytes / 1024} KB\\n\\nدسته‌ها:\\n$categorySummary\\n\\n" +
                     "اصالت رمزنگاری، اندازه، هش و رمزگشایی تصاویر بررسی شد. این فقط پیش‌نمایش است؛ هنوز هیچ فایلی به کمد فعلی منتقل یا جایگزین نمی‌شود."
+                val previewToApply = staged!!
                 val previewDialog = AlertDialog.Builder(this)
                     .setTitle("پیش‌نمایش امن پشتیبان تصاویر")
                     .setMessage(message)
-                    .setPositiveButton("بستن و پاک‌سازی فایل موقت", null)
+                    .setPositiveButton("ادغام امن تصاویر", null)
+                    .setNegativeButton("بستن و پاک‌سازی", null)
                     .create()
-                val stageToClean = staged!!.stagingDirectory
+                val stageToClean = previewToApply.stagingDirectory
                 previewDialog.setOnDismissListener { stageToClean.deleteRecursively() }
+                previewDialog.setOnShowListener {
+                    previewDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                        if (!isCurrentOwnerMediaSession()) {
+                            Toast.makeText(this, "نشست مالک تغییر کرده؛ بازیابی انجام نشد.", Toast.LENGTH_LONG).show()
+                            previewDialog.dismiss()
+                            return@setOnClickListener
+                        }
+                        AlertDialog.Builder(this)
+                            .setTitle("تأیید نهایی ادغام")
+                            .setMessage("فقط تصاویر جدید اضافه می‌شوند. تصاویر فعلی دست‌نخورده می‌مانند. شناسه‌های دارای محتوای متفاوت باعث توقف کامل عملیات می‌شوند. ادامه می‌دهی؟")
+                            .setNegativeButton("انصراف", null)
+                            .setPositiveButton("تأیید و اجرا") { _, _ ->
+                                applyWardrobeMediaRestore(previewToApply)
+                                previewDialog.dismiss()
+                            }
+                            .show()
+                    }
+                }
                 previewDialog.show()
                 staged = null
             } catch (_: Exception) {
@@ -1760,6 +1780,43 @@ class MainActivity : Activity() {
                 staged?.stagingDirectory?.deleteRecursively()
                 pass.fill('\u0000')
             }
+        }
+    }
+
+    private fun applyWardrobeMediaRestore(preview: AvaWardrobeMediaBundleCodec.StagedPreview) {
+        if (!isCurrentOwnerMediaSession()) {
+            Toast.makeText(this, "نشست مالک معتبر نیست؛ هیچ تغییری انجام نشد.", Toast.LENGTH_LONG).show()
+            return
+        }
+        try {
+            val original = prefs.getString("owner_wardrobe_images", "[]") ?: "[]"
+            val result = AvaWardrobeMediaRestoreTransaction.apply(
+                root = java.io.File(filesDir, "ava-wardrobe"),
+                journalDirectory = filesDir,
+                preview = preview,
+                currentIndexJson = original,
+                readIndex = { prefs.getString("owner_wardrobe_images", "[]") ?: "[]" },
+                writeIndex = { value ->
+                    isCurrentOwnerMediaSession() &&
+                        prefs.edit().putString("owner_wardrobe_images", value).commit()
+                },
+                isOwnerAuthorized = ::isCurrentOwnerMediaSession,
+                audit = { event, details ->
+                    isCurrentOwnerMediaSession() && aacs.recordOwnerEvent(event, details)
+                }
+            )
+            Toast.makeText(
+                this,
+                "ادغام انجام شد: ${result.added} تصویر جدید، ${result.unchanged} تصویر تکراری بدون تغییر.",
+                Toast.LENGTH_LONG
+            ).show()
+            showPage("wardrobe")
+        } catch (_: Exception) {
+            Toast.makeText(
+                this,
+                "بازیابی کامل نشد؛ تصاویر قبلی حفظ شدند. اگر تراکنش نیمه‌تمام مانده باشد، در ورود بعدی بررسی می‌شود.",
+                Toast.LENGTH_LONG
+            ).show()
         }
     }
 
@@ -1777,6 +1834,17 @@ class MainActivity : Activity() {
                 aacs.currentSessionPersonId()
             )
             if (!ownerOnly) return false
+
+            val recoveryComplete = AvaWardrobeMediaRestoreTransaction.recover(
+                root = java.io.File(filesDir, "ava-wardrobe"),
+                journalDirectory = filesDir,
+                readIndex = { prefs.getString("owner_wardrobe_images", "[]") ?: "[]" },
+                isOwnerAuthorized = ::isCurrentOwnerMediaSession,
+                audit = { event, details ->
+                    isCurrentOwnerMediaSession() && aacs.recordOwnerEvent(event, details)
+                }
+            )
+            if (!recoveryComplete) return false
 
             val original = prefs.getString("owner_wardrobe_images", "[]") ?: "[]"
             val root = java.io.File(filesDir, "ava-wardrobe").canonicalFile
