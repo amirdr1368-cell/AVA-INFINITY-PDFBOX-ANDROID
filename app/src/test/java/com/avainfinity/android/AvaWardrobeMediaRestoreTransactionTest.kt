@@ -214,6 +214,36 @@ class AvaWardrobeMediaRestoreTransactionTest {
         } finally { f.base.deleteRecursively() }
     }
 
+    @Test fun identicalItemNoOpStillRejectsAConcurrentIndexChange() {
+        val f = fixture()
+        try {
+            val entry = f.preview.entries.single()
+            val existingFile = File(f.root, entry.fileName).apply {
+                writeBytes(entry.stagedFile.readBytes())
+            }
+            val original = JSONArray().put(
+                JSONObject()
+                    .put("itemId", entry.itemId)
+                    .put("sha256", entry.sha256)
+                    .put("file", existingFile.absolutePath)
+            ).toString()
+            val concurrent = """[{"itemId":"${UUID.randomUUID()}","sha256":"${"b".repeat(64)}"}]"""
+            var writes = 0
+            var failed = false
+            try {
+                AvaWardrobeMediaRestoreTransaction.apply(
+                    f.root, f.journal, f.preview, original,
+                    readIndex = { concurrent },
+                    writeIndex = { writes++; true },
+                    isOwnerAuthorized = { true }, audit = { _, _ -> true }
+                )
+            } catch (_: Exception) { failed = true }
+            assertTrue(failed)
+            assertEquals(0, writes)
+            assertFalse(File(f.journal, "ava-wardrobe-media-restore-journal.json").exists())
+        } finally { f.base.deleteRecursively() }
+    }
+
     @Test fun recoveryFinishesCleanupWhenIndexCommitSucceededBeforeProcessExit() {
         val f = fixture()
         try {
