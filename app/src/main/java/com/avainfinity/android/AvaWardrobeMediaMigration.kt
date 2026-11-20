@@ -60,8 +60,8 @@ object AvaWardrobeMediaMigration {
             migrated.put(item)
         }
 
-        val output = migrated.toString()
-        return Outcome(output, output != original.toString(), migratedCount)
+        val changed = migratedCount > 0
+        return Outcome(if (changed) migrated.toString() else raw, changed, migratedCount)
     }
 
     private fun inspect(file: File): Triple<String, Long, String>? {
