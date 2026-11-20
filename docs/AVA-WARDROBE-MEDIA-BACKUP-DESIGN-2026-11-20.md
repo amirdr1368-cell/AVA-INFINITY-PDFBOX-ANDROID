@@ -202,6 +202,8 @@ Tests and build remain unexecuted.
 
 Implemented on `ava/mobile-app-integration`:
 - The owner image save flow now records a dedicated audit authorization event before committing the updated encrypted preference index.
+- The strict owner-session policy is re-evaluated immediately before the sensitive index commit, so a session change during file processing stops the operation.
+- Failure-path audit logging is best-effort and cannot throw a second exception out of the UI save handler.
 - The previous index string is retained during the operation. The new index is committed and immediately read back for exact equality verification.
 - If the index commit/read-back fails, the code attempts to restore the exact previous index and verifies that rollback.
 - If rollback cannot be verified, the code checks whether the live index still references the newly finalized image. It preserves that file when a reference remains, rather than deleting a file that the index may still point to.
