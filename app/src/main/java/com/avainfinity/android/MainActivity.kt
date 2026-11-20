@@ -4682,12 +4682,14 @@ class MainActivity : Activity() {
         )
         targets.forEach { image ->
             val canShowOwnerAvatar = !::aacs.isInitialized || !aacs.isPublicOnlyModeActive()
-            image.visibility = if (avatarVisible && canShowOwnerAvatar) View.VISIBLE else View.GONE
+            val hasSelectedImage = profileUri != null
+            image.visibility = if (avatarVisible && canShowOwnerAvatar && hasSelectedImage) View.VISIBLE else View.GONE
             try {
                 if (profileUri != null) image.setImageURI(profileUri)
-                else image.setImageResource(android.R.drawable.sym_def_app_icon)
+                else image.setImageDrawable(null)
             } catch (_: Exception) {
-                image.setImageResource(android.R.drawable.sym_def_app_icon)
+                image.setImageDrawable(null)
+                image.visibility = View.GONE
             }
         }
     }
