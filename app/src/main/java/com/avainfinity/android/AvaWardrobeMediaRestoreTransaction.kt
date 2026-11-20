@@ -252,6 +252,7 @@ object AvaWardrobeMediaRestoreTransaction {
                 val indexedByPath = (0 until currentArray.length()).mapNotNull { currentArray.optJSONObject(it) }
                     .associateBy { it.optString("file") }
                 for (i in 0 until files.length()) {
+                    require(isOwnerAuthorized()) { "Owner session changed during restore recovery." }
                     val item = files.getJSONObject(i)
                     val name = item.getString("name")
                     val expectedDigest = item.getString("sha256")
@@ -282,7 +283,9 @@ object AvaWardrobeMediaRestoreTransaction {
             } else {
                 return false
             }
+            require(isOwnerAuthorized()) { "Owner session changed before recovery cleanup." }
             require(!stage.exists() || stage.deleteRecursively()) { "Unable to clean recovered staging data." }
+            require(isOwnerAuthorized()) { "Owner session changed before recovery audit." }
             require(audit("WARDROBE_MEDIA_RESTORE_RECOVERY_COMPLETED", "transaction=${journal.optString("transactionId") }")) {
                 "Recovery completion audit failed; journal retained for retry."
             }
