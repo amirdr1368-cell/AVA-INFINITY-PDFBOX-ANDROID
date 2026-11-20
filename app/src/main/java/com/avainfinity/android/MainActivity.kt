@@ -222,7 +222,7 @@ class MainActivity : Activity() {
     )
 
     private fun label(value: String, size: Float = 14f): TextView =
-        text(value, size, secondaryTextColor)
+        text(value, size.coerceAtLeast(11f), secondaryTextColor)
 
     private fun label(value: String, size: Float, color: Int): TextView =
         text(value, size, color)
@@ -281,7 +281,8 @@ class MainActivity : Activity() {
         top.addView(brand, LinearLayout.LayoutParams(0, -2, 1f))
 
         avatar = ImageView(this).apply {
-            layoutParams = LinearLayout.LayoutParams(dp(56), dp(56))
+            val thumbSize = dp((56f * avatarSize / 148f).toInt().coerceIn(38, 76))
+            layoutParams = LinearLayout.LayoutParams(thumbSize, thumbSize)
             background = rounded(Color.rgb(91, 65, 99), 60, Color.rgb(224, 181, 218))
             clipToOutline = true
             scaleType = ImageView.ScaleType.CENTER_CROP
@@ -342,6 +343,24 @@ class MainActivity : Activity() {
             nav.addView(item, LinearLayout.LayoutParams(0, dp(60), 1f))
         }
         return nav
+    }
+
+    private fun addScrollablePage(content: View) {
+        val scroll = ScrollView(this).apply {
+            isFillViewport = false
+            clipToPadding = false
+            setPadding(0, dp(2), 0, dp(12))
+            overScrollMode = View.OVER_SCROLL_IF_CONTENT_SCROLLS
+        }
+        scroll.addView(content, ScrollView.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        ))
+        contentArea.addView(scroll, LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            0,
+            1f
+        ))
     }
 
     private fun showPage(target: String) {
@@ -1280,10 +1299,18 @@ class MainActivity : Activity() {
         val body = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(0, dp(8), 0, dp(18)) }
         val panel = card().apply { gravity = Gravity.CENTER }
         val preview = ImageView(this).apply {
-            layoutParams = LinearLayout.LayoutParams(dp(156), dp(156))
-            background = rounded(Color.rgb(91, 65, 105), 90, Color.rgb(229, 190, 222))
-            clipToOutline = true
-            scaleType = ImageView.ScaleType.CENTER_CROP
+            layoutParams = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                dp(250)
+            ).apply {
+                leftMargin = dp(12)
+                rightMargin = dp(12)
+            }
+            background = rounded(AvaGlassTheme.Night900, 22, AvaGlassTheme.NexusBlue)
+            clipToOutline = false
+            adjustViewBounds = true
+            scaleType = ImageView.ScaleType.FIT_CENTER
+            contentDescription = "پیش‌نمایش تمام‌قد آوا"
         }
         avatarLarge = preview
         refreshAvatar()
@@ -1335,16 +1362,9 @@ class MainActivity : Activity() {
         body.addView(personalitySettingsCard().apply { setMarginsCompat(top = 14) })
 
         val theme = card().apply { setMarginsCompat(top = 14) }
-        theme.addView(text("رنگ و حال‌وهوا", 18f, accent, true))
-        theme.addView(label("پالت فعلی: یاسی سلطانی، صورتی ملایم و رزگلد", 13f).apply { setPadding(0, dp(8), 0, dp(12)) })
-        val palettes = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
-        palettes.addView(button("یاسی") { applyPalette(0) }, LinearLayout.LayoutParams(0, -2, 1f))
-        palettes.addView(Space(this), LinearLayout.LayoutParams(dp(8), 1))
-        palettes.addView(button("رزگلد") { applyPalette(1) }, LinearLayout.LayoutParams(0, -2, 1f))
-        palettes.addView(Space(this), LinearLayout.LayoutParams(dp(8), 1))
-        palettes.addView(button("شب") { applyPalette(2) }, LinearLayout.LayoutParams(0, -2, 1f))
-        palettes.addView(button("روشن") { applyPalette(3) }, LinearLayout.LayoutParams(0, -2, 1f))
-        theme.addView(palettes)
+        theme.addView(text("هویت بصری برنامه", 18f, accent, true))
+        theme.addView(label("پوسته Obsidian × Nexus فعال است: گرافیتی عمیق، پنل‌های سرمه‌ای و تأکید آبی یخی. رنگ یاسی و رزگلد فقط برای جلوه‌های اختصاصی آوا استفاده می‌شود.", 13f)
+            .apply { setPadding(0, dp(8), 0, dp(4)) })
 
         var selectedFontPercent = (fontScale * 100).toInt()
         var selectedGlassAlpha = glassAlpha
@@ -2598,7 +2618,7 @@ class MainActivity : Activity() {
         panel.addView(button("توقف فوری گفتار") {
             stopAvaVoice()
         }.apply { setMarginsCompat(top = 8) })
-        contentArea.addView(panel)
+        addScrollablePage(panel)
     }
 
     private fun releaseSpeechRecognizer(
@@ -2830,7 +2850,7 @@ class MainActivity : Activity() {
         }
         panel.addView(button("تنظیم موتور گفتگوی هوشمند") { configureConversationProvider() }
             .apply { setMarginsCompat(top = 12) })
-        contentArea.addView(panel)
+        addScrollablePage(panel)
     }
 
     private fun configureConversationProvider() {
@@ -2978,7 +2998,7 @@ class MainActivity : Activity() {
                     requestDisablePublicOnlyMode()
                 }.apply { setMarginsCompat(top = 12) })
             }
-            contentArea.addView(panel)
+            addScrollablePage(panel)
             return
         }
         panel.addView(label("پایه کنترل دسترسی AACS فعال است: نشست، تأیید مالک، حالت عمومی و مجوزهای اختصاصی ثبت می‌شوند. اجرای کامل همه محدودیت‌ها در تمام ماژول‌ها هنوز در حال تکمیل است.", 13f).apply { setPadding(0, dp(8), 0, dp(12)) })
@@ -3101,7 +3121,7 @@ class MainActivity : Activity() {
                 ).apply { setPadding(dp(6), dp(5), dp(6), dp(5)) })
             }
         }
-        contentArea.addView(panel)
+        addScrollablePage(panel)
     }
 
     private fun addAacsPermissionEditor(panel: LinearLayout) {
