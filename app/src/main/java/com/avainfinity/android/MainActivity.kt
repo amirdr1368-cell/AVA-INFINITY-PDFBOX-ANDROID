@@ -305,6 +305,7 @@ class MainActivity : Activity() {
         "daily" -> "دستیار روزانه"
         "console" -> "کنسول مرکزی"
         "security" -> "امنیت و دسترسی"
+        "wardrobe" -> "کمد لباس آوا"
         else -> "AVA INFINITY"
     }
 
@@ -318,7 +319,7 @@ class MainActivity : Activity() {
         val items = listOf("home" to "⌂\nخانه", "chat" to "◌\nگفتگو", "memory" to "✧\nحافظه", "ava" to "∞\nآوا")
         items.forEach { (key, title) ->
             val selected = if (key == "ava") {
-                page in setOf("ava", "profile", "voice", "secret", "daily", "console", "security")
+                page in setOf("ava", "profile", "voice", "secret", "daily", "console", "security", "wardrobe")
             } else page == key
             val item = text(title, 11f, if (selected) { if (lightTheme) AvaGlassTheme.LightPrimaryText else AvaGlassTheme.Lavender300 } else secondaryTextColor, true).apply {
                 gravity = Gravity.CENTER
@@ -343,7 +344,7 @@ class MainActivity : Activity() {
     private fun showPage(target: String) {
         val knownDestinations = setOf(
             "home", "chat", "memory", "profile", "ava", "secret",
-            "daily", "voice", "console", "security"
+            "daily", "voice", "console", "security", "wardrobe"
         )
         if (target !in knownDestinations) {
             Toast.makeText(this, "این بخش در نسخه فعلی در دسترس نیست.", Toast.LENGTH_SHORT).show()
@@ -358,6 +359,7 @@ class MainActivity : Activity() {
                 "home", "chat" -> AvaDataClass.PUBLIC
                 "memory" -> AvaDataClass.PERSONAL
                 "security" -> AvaDataClass.PUBLIC
+                "wardrobe" -> AvaDataClass.CONTROL
                 else -> AvaDataClass.CONTROL
             }
             if (!aacs.canCurrentSessionAccess(requiredClass)) {
@@ -392,6 +394,7 @@ class MainActivity : Activity() {
                 "voice" -> voicePage()
                 "console" -> consolePage()
                 "security" -> securityPage()
+                "wardrobe" -> wardrobePage()
             }
         } catch (_: Exception) {
             contentArea.removeAllViews()
@@ -1397,6 +1400,70 @@ class MainActivity : Activity() {
         body.addView(theme)
         scroll.addView(body)
         contentArea.addView(scroll)
+    }
+
+    private fun wardrobePage() {
+        val body = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(0, dp(8), 0, dp(18))
+        }
+        val ownerOnly = aacs.hasActiveSession() &&
+            aacs.currentSessionPersonId() == "owner" &&
+            aacs.currentSessionLevel() == 1 &&
+            aacs.isCurrentSessionApproved() &&
+            !aacs.isPublicOnlyModeActive()
+        if (!ownerOnly) {
+            val locked = card()
+            locked.addView(text("مجموعه خصوصی", 20f, accent, true))
+            locked.addView(label("این بخش فقط پس از ورود و احراز هویت نشست مالک در دسترس است.", 13f))
+            locked.addView(button("بازگشت به مرکز آوا") { showPage("ava") }.apply { setMarginsCompat(top = 12) })
+            body.addView(locked)
+            contentArea.addView(body)
+            return
+        }
+
+        val heading = card()
+        heading.addView(text("AVA PRIVATE WARDROBE", 20f, accent, true))
+        heading.addView(label("کاتالوگ خصوصی لباس‌های تأییدشده آوا • دسترسی فقط برای مالک", 12f)
+            .apply { setPadding(0, dp(6), 0, 0) })
+        body.addView(heading)
+
+        try {
+            val raw = assets.open("ava-wardrobe-catalog.json").bufferedReader(Charsets.UTF_8).use { it.readText() }
+            val catalog = org.json.JSONObject(raw)
+            if (catalog.optInt("schemaVersion", -1) != 1) throw IllegalStateException("Unsupported wardrobe schema")
+            val items = catalog.optJSONArray("items") ?: throw IllegalStateException("Missing wardrobe items")
+            var shown = 0
+            for (index in 0 until items.length()) {
+                val item = items.optJSONObject(index) ?: continue
+                if (item.optString("category") != "private" ||
+                    item.optString("approval") != "APPROVED_BY_AMIR"
+                ) continue
+                val id = item.optInt("id", -1)
+                val name = item.optString("name").trim()
+                val description = item.optString("description").trim()
+                if (id <= 0 || name.isBlank() || description.isBlank()) continue
+                val entry = card().apply { setMarginsCompat(top = 9) }
+                entry.addView(text("$id. $name", 16f, accent, true))
+                entry.addView(label(description, 13f).apply { setPadding(0, dp(5), 0, 0) })
+                entry.addView(label("تأیید طراحی: امیر • تصویر نهایی: در انتظار تهیه", 10f)
+                    .apply { setPadding(0, dp(6), 0, 0) })
+                body.addView(entry)
+                shown++
+            }
+            if (shown == 0) {
+                body.addView(label("هنوز مدل تأییدشده‌ای در کاتالوگ وجود ندارد.", 13f))
+            }
+            body.addView(label("تصاویر نمونه نمایش‌داده‌شده در مرحله طراحی، هنوز فایل تصویری داخل برنامه نیستند. این کاتالوگ فقط ثبت داده و نمایش اطلاعات لباس را انجام می‌دهد.", 11f)
+                .apply { setPadding(dp(2), dp(12), dp(2), dp(4)) })
+        } catch (_: Exception) {
+            val error = card().apply { setMarginsCompat(top = 10) }
+            error.addView(text("کاتالوگ در دسترس نیست", 16f, accent, true))
+            error.addView(label("خواندن یا اعتبارسنجی فایل کمد انجام نشد؛ داده‌ها تغییر داده نشدند.", 12f))
+            body.addView(error)
+        }
+        body.addView(button("بازگشت به مرکز آوا") { showPage("ava") }.apply { setMarginsCompat(top = 12) })
+        contentArea.addView(body)
     }
 
     private fun secretPage() {
