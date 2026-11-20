@@ -145,3 +145,18 @@ The current implementation was reviewed before any media feature code was writte
 8. Only after all static review and tests pass, consider the single final APK build and workflow run.
 
 No source-code implementation was changed as part of this review.
+
+## 14. Implementation progress (2026-11-20)
+
+Completed on `ava/mobile-app-integration`:
+- Added `AvaWardrobeMediaPolicy`, a pure shared policy requiring public-only mode off, an active session, an approved session, level 1 and person ID `owner`.
+- Replaced the three duplicated strict owner checks in `wardrobePage()`, `showAddWardrobeImageDialog()` and `saveOwnerWardrobeImage()` with the shared policy.
+- Added `AvaWardrobeMediaPolicyTest` covering the allowed owner case and rejection of missing/unapproved sessions, public-only mode, other identities and other privilege levels.
+- Fetched the committed files back from the branch and verified the policy implementation, tests and all three call sites are present.
+
+Not yet completed:
+- The unit tests have **not** been executed; no Gradle test, APK build or GitHub Actions workflow has been run.
+- No media bundle encryption, export, import, staging or restore code has been implemented.
+- Existing image import still needs actual image signature/dimension validation and a versioned metadata/index migration before portable media export can safely proceed.
+
+This small authorization refactor does not change the behavior of the general backup controls and does not make wardrobe images portable yet.
