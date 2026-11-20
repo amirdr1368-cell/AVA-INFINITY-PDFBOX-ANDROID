@@ -241,7 +241,7 @@ object AvaWardrobeMediaRestoreTransaction {
         val journalFile = File(journalDirectory.canonicalFile, JOURNAL_NAME)
         if (!journalFile.exists()) return true
         if (!audit("WARDROBE_MEDIA_RESTORE_RECOVERY_REQUESTED", "pending restore journal found")) return false
-        return try {
+        try {
             val journal = JSONObject(journalFile.readText(Charsets.UTF_8))
             require(journal.optInt("version", -1) == JOURNAL_VERSION)
             val current = readIndex() ?: return false
@@ -297,9 +297,9 @@ object AvaWardrobeMediaRestoreTransaction {
                 "Recovery completion audit failed; journal retained for retry."
             }
             require(journalFile.delete() || !journalFile.exists())
-            true
+            return true
         } catch (_: Exception) {
-            false
+            return false
         }
     }
 
