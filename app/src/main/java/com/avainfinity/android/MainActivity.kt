@@ -1453,7 +1453,7 @@ class MainActivity : Activity() {
             locked.addView(label("این بخش فقط پس از ورود و احراز هویت نشست مالک در دسترس است.", 13f))
             locked.addView(button("بازگشت به مرکز آوا") { showPage("ava") }.apply { setMarginsCompat(top = 12) })
             body.addView(locked)
-            contentArea.addView(body)
+            addScrollablePage(body)
             return
         }
 
@@ -1600,7 +1600,7 @@ class MainActivity : Activity() {
             body.addView(label("کاتالوگ مدل مو فعلاً در دسترس نیست.", 11f))
         }
         body.addView(button("بازگشت به مرکز آوا") { showPage("ava") }.apply { setMarginsCompat(top = 12) })
-        contentArea.addView(body)
+        addScrollablePage(body)
     }
 
     private fun isCurrentOwnerMediaSession(): Boolean =
