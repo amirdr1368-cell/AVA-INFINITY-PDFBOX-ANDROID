@@ -1621,11 +1621,12 @@ class MainActivity : Activity() {
     private fun exportWardrobeMediaBundle(destinationUri: Uri, passphrase: CharArray) {
         val temporaryBundle = java.io.File(cacheDir, "ava-wardrobe-export-${java.util.UUID.randomUUID()}.tmp")
         var verificationStage: AvaWardrobeMediaBundleCodec.StagedPreview? = null
+        var destinationTouched = false
         try {
             if (!isCurrentOwnerMediaSession()) error("Owner session changed before export")
             val rootDirectory = java.io.File(filesDir, "ava-wardrobe").canonicalFile
             val index = org.json.JSONArray(prefs.getString("owner_wardrobe_images", "[]") ?: "[]")
-            require(index.length() <= AvaWardrobeMediaBundleCodec.MAX_ITEMS) { "Too many wardrobe images" }
+            require(index.length() in 1..AvaWardrobeMediaBundleCodec.MAX_ITEMS) { "No wardrobe images or too many items" }
             val entries = mutableListOf<AvaWardrobeMediaBundleCodec.ExportEntry>()
             for (position in 0 until index.length()) {
                 val item = index.optJSONObject(position) ?: error("Wardrobe index contains an invalid record")
@@ -1666,12 +1667,14 @@ class MainActivity : Activity() {
             verificationStage = null
 
             require(isCurrentOwnerMediaSession()) { "Owner session changed before publishing export" }
+            destinationTouched = true
             contentResolver.openOutputStream(destinationUri, "w")?.use { output ->
                 java.io.FileInputStream(temporaryBundle).use { input -> input.copyTo(output) }
                 output.flush()
             } ?: error("Unable to open selected export destination")
 
             // Verify the bytes after the document provider has stored them.
+            require(isCurrentOwnerMediaSession()) { "Owner session changed before destination read-back" }
             verificationStage = contentResolver.openInputStream(destinationUri)?.use { input ->
                 AvaWardrobeMediaBundleCodec.decryptToStaging(
                     input,
@@ -1692,6 +1695,9 @@ class MainActivity : Activity() {
             Toast.makeText(this, "پشتیبان تصاویر ساخته و از مقصد دوباره بررسی شد.", Toast.LENGTH_LONG).show()
             showPage("wardrobe")
         } catch (_: Exception) {
+            if (destinationTouched) {
+                runCatching { android.provider.DocumentsContract.deleteDocument(contentResolver, destinationUri) }
+            }
             runCatching { aacs.recordOwnerEvent("WARDROBE_MEDIA_EXPORT_FAILED", "encrypted media export did not complete") }
             Toast.makeText(this, "ساخت یا بررسی پشتیبان تصاویر کامل نشد؛ فایل‌های کمد تغییر نکردند.", Toast.LENGTH_LONG).show()
         } finally {
