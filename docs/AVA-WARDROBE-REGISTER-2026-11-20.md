@@ -28,7 +28,9 @@ All six entries below were explicitly approved by Amir for Ava's protected priva
 - **APPROVED — DESIGN:** all six entries.
 - **DOCUMENTED:** this register and `app/src/main/assets/ava-wardrobe-catalog.json`.
 - **IMAGE ASSETS:** pending. The sample images shown during design review are visual references, not repository assets.
-- **APP UI / runtime access control:** pending implementation and review.
+- **APP UI:** an owner-only catalog screen is implemented in `MainActivity.kt` and linked discreetly from the AVA hub.
+- **RUNTIME ACCESS CONTROL:** the screen requires an active, approved Level 1 owner session (`owner`) and refuses public-only, missing-session, and non-owner contexts. The route is also behind the existing CONTROL access gate.
+- **SOURCE REVIEW:** route, hub entry, owner gate, and asset-catalog read path were confirmed in the current branch source.
 - **BUILD VERIFIED / DEVICE VERIFIED:** not claimed. No GitHub Actions or APK build was started for this change.
 
 ## Change-control
