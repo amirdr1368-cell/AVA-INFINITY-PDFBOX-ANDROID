@@ -232,3 +232,20 @@ Compatibility note:
 - Existing legacy index records are not rewritten or deleted. The current gallery remains able to display legacy entries when their stored path resolves to an app-generated, bounded file in the private wardrobe directory.
 - A full metadata migration for legacy entries is still pending. It must be all-or-nothing or staged, preserve every original record, and never infer trusted metadata from an unvalidated file.
 - No tests have been executed and no build/workflow has been run.
+
+
+## 18. Non-destructive legacy wardrobe metadata migration (2026-11-20)
+
+Implemented on `ava/mobile-app-integration`:
+- Added `AvaWardrobeMediaMigration` to enrich legacy owner image-index entries with missing `itemId`, detected `mimeType`, actual `byteLength`, and SHA-256 metadata.
+- Migration only inspects app-generated UUIDv4 image files that pass the canonical private-directory policy, size bound, recognized byte signature, and filename-extension match.
+- Existing record fields, names, categories, timestamps, file paths, and array entries are retained. Unsafe, missing, malformed, or unsupported legacy file references remain untouched; no image file is deleted or renamed.
+- Migration is idempotent. When no record is enriched, the original JSON string is returned unchanged and no preference write occurs.
+- The owner-gated wardrobe page invokes migration. It rechecks the owner session before commit, requires an audit authorization event, verifies the preference write by read-back, and attempts an exact rollback if commit verification fails.
+- Added JVM tests for metadata enrichment and field preservation, SHA-256, idempotence, unsafe/missing references, extension mismatch, and unchanged-index no-op behavior.
+
+Verification status:
+- New source, integration, tests, and documentation were fetched back from GitHub and inspected.
+- Gradle tests, compile, APK build, and GitHub Actions have not been run, by design.
+- This migration enriches local metadata only. It does not create a media backup or implement restore.
+
