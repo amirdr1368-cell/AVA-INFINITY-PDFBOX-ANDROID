@@ -1734,7 +1734,7 @@ class MainActivity : Activity() {
                 ) error("Audit confirmation failed")
 
                 val counts = staged!!.entries.groupingBy { it.category }.eachCount()
-                val categorySummary = counts.entries.joinToString("\\n") { "${it.key}: ${it.value}" }
+                val categorySummary = counts.entries.joinToString("\n") { "${it.key}: ${it.value}" }
                     .ifBlank { "بسته خالی است." }
                 val message = "شناسه بسته: ${staged!!.bundleId}\\n" +
                     "تاریخ ساخت: ${java.text.DateFormat.getDateTimeInstance().format(java.util.Date(staged!!.createdAt))}\\n" +
@@ -2215,7 +2215,7 @@ class MainActivity : Activity() {
                 index to "نسخه ${version.optInt("version")} • ${version.optString("word")} • ${version.optString("status", "قدیمی")}"
             }
         }
-        val message = if (versions.isEmpty()) "هنوز نسخه قبلی برای این واژه ثبت نشده است." else versions.joinToString("\\n") { it.second }
+        val message = if (versions.isEmpty()) "هنوز نسخه قبلی برای این واژه ثبت نشده است." else versions.joinToString("\n") { it.second }
         val builder = AlertDialog.Builder(this).setTitle("تاریخچه ${item.optString("word")}")
             .setMessage(message).setPositiveButton("بستن", null)
         if (versions.isNotEmpty()) {
@@ -4059,7 +4059,13 @@ class MainActivity : Activity() {
             }
             return
         }
-        val uri = data?.data ?: return
+        val uri = data?.data ?: run {
+            if (requestCode == 5401) {
+                pendingWardrobeMediaExportPassphrase?.fill('\u0000')
+                pendingWardrobeMediaExportPassphrase = null
+            }
+            return
+        }
         when (requestCode) {
             4104 -> saveOwnerWardrobeImage(uri)
             5401 -> {
