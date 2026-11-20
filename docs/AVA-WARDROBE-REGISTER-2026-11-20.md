@@ -55,3 +55,5 @@ Implement only on `ava/mobile-app-integration`. Keep `master` untouched and PR #
 - Each image is limited to 15 MB. The import is guarded by the approved owner session and records audit events.
 - These user-imported local images are separate from the 123 bundled catalog designs and do not automatically upload to GitHub or sync to another device. App reinstall/data-clear may remove app-private copies unless separately backed up.
 - Implementation is committed but has not yet been compiled or runtime-tested. No Build or GitHub Actions run was triggered.
+
+- Image previews are decoded as downsampled thumbnails (maximum 1200 px on the longest side) to reduce memory pressure on mobile devices; the original selected file remains stored privately.
