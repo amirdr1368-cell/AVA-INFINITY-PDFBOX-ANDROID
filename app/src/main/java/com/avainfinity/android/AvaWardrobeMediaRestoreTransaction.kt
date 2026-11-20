@@ -58,7 +58,7 @@ object AvaWardrobeMediaRestoreTransaction {
         }
 
         val next = JSONArray(currentIndexJson)
-        require(preview.entries.size <= AvaWardrobeMediaBundleCodec.MAX_ITEMS)
+        require(preview.entries.isNotEmpty() && preview.entries.size <= AvaWardrobeMediaBundleCodec.MAX_ITEMS)
         require(preview.entries.map { it.itemId.lowercase(Locale.ROOT) }.distinct().size == preview.entries.size)
         require(preview.stagingDirectory.isDirectory)
         require(preview.entries.sumOf { it.byteLength } == preview.totalBytes &&
@@ -100,7 +100,11 @@ object AvaWardrobeMediaRestoreTransaction {
                 }
                 unchanged++
             } else {
-                val finalFile = File(canonicalRoot, entry.fileName)
+                val finalFile = File(canonicalRoot, entry.fileName).canonicalFile
+                require(byId.values.none { record ->
+                    val indexedPath = record.optString("file")
+                    indexedPath.isNotBlank() && runCatching { File(indexedPath).canonicalFile == finalFile }.getOrDefault(false)
+                }) { "A target filename is already referenced by another wardrobe record." }
                 require(!finalFile.exists()) { "A target filename already exists outside the current index." }
                 additions.add(entry)
                 val categoryLabel = when (entry.category) {
