@@ -45,3 +45,13 @@ Implement only on `ava/mobile-app-integration`. Keep `master` untouched and PR #
 - Both catalogs explicitly mark these as `EXTERNAL_REFERENCE_ONLY`. They are reference URLs, not downloaded/bundled image files.
 - The 123 numbered wardrobe designs remain approved catalog entries with local visual assets pending. Do not count external links as local image assets.
 - No Android build or GitHub Actions workflow was run as part of this visual-reference update.
+
+
+## In-app image import (2026-11-20)
+
+- Added an owner-only `افزودن تصویر از گوشی` action to the wardrobe page.
+- The picker supports image selection from Android's document picker and lets the owner assign a name and category: sporty, everyday, formal, homewear, private, hairstyle, or other.
+- Selected images are copied into the app's private internal `filesDir/ava-wardrobe` directory (not the public gallery), indexed in app preferences, and previewed in the wardrobe page.
+- Each image is limited to 15 MB. The import is guarded by the approved owner session and records audit events.
+- These user-imported local images are separate from the 123 bundled catalog designs and do not automatically upload to GitHub or sync to another device. App reinstall/data-clear may remove app-private copies unless separately backed up.
+- Implementation is committed but has not yet been compiled or runtime-tested. No Build or GitHub Actions run was triggered.
