@@ -8,11 +8,12 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.avainfinity.android"
+        // Keep the Next application identity stable so this build matches AVA Next 1.0.1.
+        applicationId = "com.avainfinity.android.next"
         minSdk = 23
         targetSdk = 35
         versionCode = 2
-        versionName = "1.0.1"
+        versionName = "1.0.1-next"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
